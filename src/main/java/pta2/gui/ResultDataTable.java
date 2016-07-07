@@ -1,7 +1,7 @@
 /**
  * 
  */
-package spta.gui;
+package pta2.gui;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
@@ -27,9 +27,9 @@ import javax.swing.table.TableRowSorter;
 import ij.ImagePlus;
 import ij.WindowManager;
 import ij.measure.Calibration;
-import spta.SimplePTA;
-import spta.data.AnalyzeTrack;
-import spta.data.TrackPoint;
+import pta2.PTA2;
+import pta2.data.AnalyzeTrack;
+import pta2.data.TrackPoint;
 /**
  * @author araiyoshiyuki
  *
@@ -171,13 +171,13 @@ public class ResultDataTable extends JFrame {
 			selectedlist = jt.getSelectedRows();
 			for (int ind = 0; ind < selectedlist.length; ind++) 
 				selectedlist[ind] = jt.convertRowIndexToModel(selectedlist[ind]);
-			SimplePTA.selectedlist = selectedlist;
-			SimplePTA.tracklist = tracklist;
-			cframe = SimplePTA.getcframe();
+			PTA2.selectedlist = selectedlist;
+			PTA2.tracklist = tracklist;
+			cframe = PTA2.getcframe();
 			if (selectedlist.length == 1) {
 				if (cframe == null) {
 					cframe = new ChartFrame(imp, tracklist.get(index));
-					SimplePTA.setcframe(cframe);
+					PTA2.setcframe(cframe);
 				}
 				else
 					cframe.drawTrajectory(tracklist.get(index));

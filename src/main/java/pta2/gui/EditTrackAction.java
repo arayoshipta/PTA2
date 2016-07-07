@@ -1,7 +1,7 @@
 /**
  * 
  */
-package spta.gui;
+package pta2.gui;
 
 import java.awt.event.ActionEvent;
 import java.util.ArrayList;
@@ -14,8 +14,8 @@ import javax.swing.JTable;
 import ij.IJ;
 import ij.ImagePlus;
 import ij.gui.GenericDialog;
-import spta.SimplePTA;
-import spta.data.TrackPoint;
+import pta2.PTA2;
+import pta2.data.TrackPoint;
 
 /**
  * @author araiyoshiyuki
@@ -94,7 +94,7 @@ public class EditTrackAction extends AbstractAction {
 		rdt.setVisible(false);
 		rdt.dispose(); // Destroy JFrame
 		rdt = new ResultDataTable(tracklist, imp);
-		SimplePTA.updateRDT(imp, rdt);
+		PTA2.updateRDT(imp, rdt);
 	}
 
 	private void splitTrack() {
@@ -116,7 +116,7 @@ public class EditTrackAction extends AbstractAction {
 			rdt.setVisible(false);
 			rdt.dispose(); // Destroy JFrame
 			rdt = new ResultDataTable(tracklist, imp);
-			SimplePTA.updateRDT(imp, rdt);
+			PTA2.updateRDT(imp, rdt);
 		}
 	}
 
@@ -131,7 +131,7 @@ public class EditTrackAction extends AbstractAction {
 			rdt.setVisible(false);
 			rdt.dispose(); // Destroy JFrame
 			rdt = new ResultDataTable(tracklist, imp);
-			SimplePTA.updateRDT(imp, rdt);
+			PTA2.updateRDT(imp, rdt);
 		}
 	}
 

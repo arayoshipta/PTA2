@@ -1,7 +1,7 @@
 /**
  * 
  */
-package spta.data;
+package pta2.data;
 
 import java.util.List;
 

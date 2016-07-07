@@ -1,16 +1,16 @@
 /**
  * 
  */
-package spta.gui;
+package pta2.gui;
 
 import javax.swing.JFrame;
 
 import ij.*;
 import ij.gui.*;
 import ij.process.*;
-import spta.SimplePTA;
-import spta.data.TrackPoint;
-import spta.track.TrackObject;
+import pta2.PTA2;
+import pta2.data.TrackPoint;
+import pta2.track.TrackObject;
 
 import java.awt.GridBagLayout;
 import java.awt.GridLayout;
@@ -264,7 +264,7 @@ public class MainWindow extends JFrame {
 		RoiSize.setToolTipText("The lenght of the side of square ROI (Pixels)");
 		RoiSize.addChangeListener(new ChangeListener() {
 			public void stateChanged(ChangeEvent e) {
-				SimplePTA.roisize = (Integer)roisize.getValue();
+				PTA2.roisize = (Integer)roisize.getValue();
 			}
 		});
 		DetectionParamPanel.add(RoiSize);
@@ -278,7 +278,7 @@ public class MainWindow extends JFrame {
 		SearchRange.setToolTipText("The length of the side of a square ROI which limits the search range to find next object. ");
 		SearchRange.addChangeListener(new ChangeListener() {
 			public void stateChanged(ChangeEvent e) {
-				SimplePTA.searchrange = (Integer)searchrange.getValue();
+				PTA2.searchrange = (Integer)searchrange.getValue();
 			}
 		});
 		DetectionParamPanel.add(SearchRange);

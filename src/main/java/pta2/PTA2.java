@@ -1,12 +1,12 @@
 /**
  * 
  */
-package spta;
+package pta2;
 
 import ij.plugin.frame.*;
 import ij.process.*;
-import spta.gui.*;
-import spta.data.*;
+import pta2.data.*;
+import pta2.gui.*;
 
 import java.awt.Font;
 import java.awt.Frame;
@@ -26,7 +26,7 @@ import ij.measure.Calibration;
  * @author araiyoshiyuki
  *
  */
-public class SimplePTA extends PlugInFrame {
+public class PTA2 extends PlugInFrame {
 
 	/**
 	 * 
@@ -45,7 +45,7 @@ public class SimplePTA extends PlugInFrame {
 	private ImageListener listener;
 	public static int[] selectedlist;
 
-	public SimplePTA() {
+	public PTA2() {
 		super("PTA");
 		// VersionCheck
 		if (IJ.versionLessThan("1.43g"))

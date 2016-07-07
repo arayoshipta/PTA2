@@ -1,7 +1,7 @@
 /**
  * 
  */
-package spta.gui;
+package pta2.gui;
 
 import javax.swing.JFrame;
 import javax.swing.JPanel;
@@ -17,8 +17,8 @@ import org.jfree.data.xy.DefaultXYDataset;
 import ij.IJ;
 import ij.ImagePlus;
 import ij.measure.Calibration;
-import spta.data.AnalyzeTrack;
-import spta.data.TrackPoint;
+import pta2.data.AnalyzeTrack;
+import pta2.data.TrackPoint;
 
 import java.awt.BorderLayout;
 import java.awt.GridLayout;

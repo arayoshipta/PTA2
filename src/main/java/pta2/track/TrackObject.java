@@ -1,7 +1,7 @@
 /**
  * 
  */
-package spta.track;
+package pta2.track;
 
 import java.awt.Color;
 import java.awt.geom.GeneralPath;
@@ -16,10 +16,10 @@ import ij.*;
 import ij.gui.*;
 import ij.measure.*;
 import ij.process.*;
-import spta.SimplePTA;
-import spta.data.TrackPoint;
-import spta.gui.MainWindow;
-import spta.gui.ResultDataTable;
+import pta2.PTA2;
+import pta2.data.TrackPoint;
+import pta2.gui.MainWindow;
+import pta2.gui.ResultDataTable;
 
 /**
  * @author araiyoshiyuki
@@ -209,7 +209,7 @@ public class TrackObject extends Thread implements Measurements{
 	public void run() {
 		int totalframe = imp.getNFrames();
 		List<TrackPoint> track = new ArrayList<TrackPoint>(100);
-		tracklist = SimplePTA.getTrackList();
+		tracklist = PTA2.getTrackList();
 		Overlay ol;
 		
 		if(imp.getOverlay() == null) 
@@ -244,19 +244,19 @@ public class TrackObject extends Thread implements Measurements{
 		
 		imp.setOverlay(ol);
 		tracklist.add(track);
-		SimplePTA.setTrackList(tracklist);
-		rdt = SimplePTA.getRDT();
+		PTA2.setTrackList(tracklist);
+		rdt = PTA2.getRDT();
 		
 		if (rdt == null) {
 			rdt = new ResultDataTable(tracklist, imp);
-			SimplePTA.updateRDT(imp, rdt);
+			PTA2.updateRDT(imp, rdt);
 		} else {
 			rdt.setVisible(false);
 			rdt.dispose(); // Destroy JFrame
 			rdt = new ResultDataTable(tracklist, imp);
-			SimplePTA.updateRDT(imp, rdt);
+			PTA2.updateRDT(imp, rdt);
 		}
-		SimplePTA.updateRDT(imp, rdt);
+		PTA2.updateRDT(imp, rdt);
 		imp.updateAndDraw();
 		IJ.log("Tracking ends");
 	}

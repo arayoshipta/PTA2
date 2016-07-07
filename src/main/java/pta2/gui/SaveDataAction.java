@@ -1,7 +1,7 @@
 /**
  * 
  */
-package spta.gui;
+package pta2.gui;
 
 import java.awt.Color;
 import java.awt.event.ActionEvent;
@@ -21,8 +21,8 @@ import javax.swing.JTable;
 import ij.IJ;
 import ij.ImagePlus;
 import ij.io.SaveDialog;
-import spta.data.AnalyzeTrack;
-import spta.data.TrackPoint;
+import pta2.data.AnalyzeTrack;
+import pta2.data.TrackPoint;
 
 /**
  * @author araiyoshiyuki

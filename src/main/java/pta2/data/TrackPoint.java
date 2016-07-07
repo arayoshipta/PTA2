@@ -1,4 +1,4 @@
-package spta.data;
+package pta2.data;
 
 import ij.IJ;
 import ij.measure.Calibration;

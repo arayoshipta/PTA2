@@ -1,7 +1,7 @@
 /**
  * 
  */
-package spta.gui;
+package pta2.gui;
 
 import java.awt.Color;
 import java.awt.Component;

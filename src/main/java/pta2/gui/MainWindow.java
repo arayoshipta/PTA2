@@ -7,13 +7,17 @@ import javax.swing.JFrame;
 
 import ij.*;
 import ij.gui.*;
+import ij.plugin.filter.MaximumFinder;
 import ij.process.*;
 import pta2.PTA2;
 import pta2.data.TrackPoint;
-import pta2.track.TrackObject;
+import pta2.track.MultiTrackObjects;
+import pta2.track.SingleTrackObject;
 
 import java.awt.GridBagLayout;
 import java.awt.GridLayout;
+import java.awt.Polygon;
+
 import javax.swing.JButton;
 import javax.swing.JPanel;
 import java.awt.FlowLayout;
@@ -52,6 +56,7 @@ public class MainWindow extends JFrame {
 	
 	public SpinnerNumberModel roisize;
 	public SpinnerNumberModel searchrange;
+	public SpinnerNumberModel tol;
 	public int method;
 	public boolean stateOfTrajectory = true;
 
@@ -66,7 +71,7 @@ public class MainWindow extends JFrame {
 	private JCheckBox NumberCheckBox;
 	//public List<List<TrackPoint>> tracklist;
 	
-	TrackObject to;
+	SingleTrackObject to;
 	
 	public MainWindow(final ImagePlus imp, final List<List<TrackPoint>> tracklist) {
 		setBounds(new Rectangle(500, 220, 550, 200));
@@ -74,7 +79,7 @@ public class MainWindow extends JFrame {
 		this.imp = imp;
 		//this.tracklist = tracklist;
 		
-		setTitle("Simple PTA");
+		setTitle("PTA2");
 		setResizable(false);
 		getContentPane().setLayout(new GridLayout(1, 2, 0, 0));
 		
@@ -88,12 +93,30 @@ public class MainWindow extends JFrame {
 		
 		JPanel panel = new JPanel();
 		TrackPanel.add(panel);
+		panel.setLayout(new GridLayout(3, 1, 0, 0));
 		
-		JButton DoTrackButton = new JButton("Single Track");
+		JButton PreviewButton = new JButton("Preview");
+		panel.add(PreviewButton);
+		PreviewButton.addActionListener(new ActionListener() {
+
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				MaximumFinder mf = new MaximumFinder();
+				Polygon mp = mf.getMaxima(imp.getProcessor(), (Double)tol.getValue(), true);
+				DrawRois dr = new DrawRois(imp, mp, (Integer)roisize.getValue());
+				dr.show();
+			}
+			
+		});
+		
+		JButton DoTrackButton = new JButton("Multi Track");
 		DoTrackButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				Roi currentRoi = imp.getRoi();
-				int roitype = currentRoi.getType();
+				int roitype = 0;
+				if (currentRoi != null)
+					roitype = currentRoi.getType();
+				
 				int[] param = new int[4];
 
 				param = retParam();
@@ -103,6 +126,7 @@ public class MainWindow extends JFrame {
 					return;
 				}
 				
+				// convert slice to frame
 				if(imp.getStackSize() != imp.getNFrames()) {
 					GenericDialog yesnostack = new GenericDialog("Frame or Slice?");
 					yesnostack.addMessage("Total Slice size: " + imp.getNSlices() + " is not equal "
@@ -114,25 +138,36 @@ public class MainWindow extends JFrame {
 						imp.setDimensions(1, 1, imp.getStackSize());
 					}
 				}
-				if (roitype == 2 && (imp.getSlice() != imp.getStackSize())) { // i.e Roi is wand
+				
+				if (roitype == Roi.RECTANGLE && (imp.getSlice() != imp.getStackSize())) { // i.e Roi is wand
 					GenericDialog yesnotrack = new GenericDialog("Track?");
-					yesnotrack.addMessage("Track this object?");
+					yesnotrack.addMessage("Track all object?");
 					yesnotrack.enableYesNoCancel();
 					yesnotrack.showDialog();
 					if(yesnotrack.wasOKed()) {
-						IJ.log("Start Tracking");
-						to = new TrackObject(imp, currentRoi, method, param, roisize, searchrange, tracklist);
-						to.start();
+						MultiTrackObjects mto = new MultiTrackObjects(imp, method, param, tol, roisize, searchrange, tracklist);
+						mto.start();
 					}
 				}
 			}
 		});
 		panel.add(DoTrackButton);
 		
+		JPanel TolerancePanel = new JPanel();
+		panel.add(TolerancePanel);
+		TolerancePanel.setLayout(new GridLayout(1, 2, 0, 0));
+		
+		JLabel LabelTol = new JLabel("Tol.");
+		LabelTol.setToolTipText("Noise Tolerance for find maxima");
+		TolerancePanel.add(LabelTol);
+
+		tol = new SpinnerNumberModel(15D, 0D, 100D, 0.1D); //
+		JSpinner Tol = new JSpinner(tol);
+		TolerancePanel.add(Tol);
+		
 		JPanel DetectionPanel = new JPanel();
 		TrackPanel.add(DetectionPanel);
-		DetectionPanel.setBorder(new TitledBorder(new EtchedBorder(EtchedBorder.LOWERED, null, null),
-				"Detection Methods", TitledBorder.LEADING, TitledBorder.TOP, null, new Color(0, 0, 0)));
+		DetectionPanel.setBorder(new TitledBorder(new EtchedBorder(EtchedBorder.LOWERED, null, null), "Localization", TitledBorder.LEADING, TitledBorder.TOP, null, new Color(0, 0, 0)));
 		DetectionPanel.setLayout(new GridLayout(0, 1, 0, 0));
 		
 		JRadioButton Centroid_RadioButton = new JRadioButton("Centroid");

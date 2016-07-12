@@ -1,5 +1,7 @@
 package pta2.data;
 
+import org.apache.commons.math3.ml.distance.EuclideanDistance;
+
 import ij.IJ;
 import ij.measure.Calibration;
 
@@ -31,16 +33,28 @@ public class TrackPoint {
 		this.roisize = roisize;
 	}
 	
+	public TrackPoint(double xCentroid, double yCentroid, double sigmax, double sigmay, 
+			double area, double mean, double circ, int frame, int roisize) {
+		this.tx = xCentroid;
+		this.ty = yCentroid;
+		this.sx = sigmax;
+		this.sy = sigmay;
+		this.area = area;
+		this.mean = mean;
+		this.frame = frame;
+		this.circ = circ;
+		this.roisize = roisize;
+	}
+	
 	public static double calcDistance(TrackPoint fp, TrackPoint sp, int[] param, int searchrange, Calibration cal) {
 		/*
 		 * fp: first point
 		 * sp: second point
 		 * param: parameter for calc distance
 		 */
-		double d = (fp.tx / cal.pixelWidth - sp.tx / cal.pixelWidth) * 
-				(fp.tx / cal.pixelWidth - sp.tx / cal.pixelWidth) +
-				(fp.ty / cal.pixelHeight - sp.ty / cal.pixelHeight) * 
-				(fp.ty / cal.pixelHeight - sp.ty / cal.pixelHeight);
+		EuclideanDistance ed = new EuclideanDistance();  // calculate euclideanDistance
+		double d = ed.compute(new double[]{fp.tx, fp.ty}, new double[]{sp.tx, sp.ty});
+		d = d / cal.pixelWidth;  // convert to pixel value
 		if (Math.sqrt(d) > searchrange) {
 			IJ.log("d = " + d);
 			return 0;

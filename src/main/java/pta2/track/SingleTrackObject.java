@@ -25,7 +25,7 @@ import pta2.gui.ResultDataTable;
  * @author araiyoshiyuki
  *
  */
-public class TrackObject extends Thread implements Measurements{
+public class SingleTrackObject extends Thread implements Measurements{
 	
 	private ImagePlus imp;
 	private int method;
@@ -40,17 +40,17 @@ public class TrackObject extends Thread implements Measurements{
 	private static ResultDataTable rdt;
 	private MainWindow mw;
 
-	public TrackObject(ImagePlus imp, MainWindow mw) {
+	public SingleTrackObject(ImagePlus imp, MainWindow mw) {
 		this.imp =  imp;
 		this.mw = mw;
 	}
 	
-	public TrackObject(ImagePlus imp, int method) {
+	public SingleTrackObject(ImagePlus imp, int method) {
 		this.imp = imp;
 		this.method = method;
 	}
 	
-	public TrackObject(ImagePlus imp, Roi selRoi, int method, int[] param, SpinnerNumberModel roisize,
+	public SingleTrackObject(ImagePlus imp, Roi selRoi, int method, int[] param, SpinnerNumberModel roisize,
 			SpinnerNumberModel searchrange, List<List<TrackPoint>> tracklist) {
 		this.imp = imp;
 		this.method = method;
@@ -277,7 +277,7 @@ public class TrackObject extends Thread implements Measurements{
 		int ey = ((int)cy + searchrange / 2)>ip.getHeight()?ip.getHeight():((int)cy + searchrange / 2);
 		List<TrackPoint> templist = new ArrayList<TrackPoint>(5);
 		byte[] mask = new byte[searchrange * searchrange];
-		TrackObject to = new TrackObject(imp, mw);
+		SingleTrackObject to = new SingleTrackObject(imp, mw);
 		for(int dx = sx, ax = 0;dx<ex;dx++, ax++) {
 			for(int dy = sy, ay = 0;dy<ey;dy++, ay++) {
 				double val = Float.intBitsToFloat(fip.getPixel(dx, dy));

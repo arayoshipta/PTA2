@@ -107,6 +107,10 @@ public class MultiTrackObjects extends Thread implements Measurements{
 					continue; // skip points
 				}
 				
+				if (methods == 4) { // Find maxima
+					tp = new TrackPoint(x * cal.pixelWidth, y * cal.pixelHeight, val, currentframe, roisize);
+				}
+				
 				Wand wand = new Wand(ip);
 				wand.autoOutline((int)x, (int)y, lt, ut);
 				Roi wandRoi = new PolygonRoi(wand.xpoints, wand.ypoints, wand.npoints, Roi.POLYGON);

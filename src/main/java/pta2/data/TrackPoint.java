@@ -22,10 +22,20 @@ public class TrackPoint {
 		this.tx = 0;
 		this.ty = 0;
 	}
+	
+	public TrackPoint(double x, double y, double peakIntensity, int frame, int roisize) {
+		this.tx = x;
+		this.ty = y;
+		this.mean = peakIntensity;
+		this.frame = frame;
+		this.circ = 1;
+		this.roisize = roisize;
+		this.area = roisize * roisize;
+	}
 
-	public TrackPoint(double xCentroid, double yCentroid, double area, double mean, double circ, int frame, int roisize) {
-		this.tx = xCentroid;
-		this.ty = yCentroid;
+	public TrackPoint(double x, double y, double area, double mean, double circ, int frame, int roisize) {
+		this.tx = x;
+		this.ty = y;
 		this.area = area;
 		this.mean = mean;
 		this.frame = frame;
@@ -33,10 +43,10 @@ public class TrackPoint {
 		this.roisize = roisize;
 	}
 	
-	public TrackPoint(double xCentroid, double yCentroid, double sigmax, double sigmay, 
+	public TrackPoint(double x, double y, double sigmax, double sigmay, 
 			double area, double mean, double circ, int frame, int roisize) {
-		this.tx = xCentroid;
-		this.ty = yCentroid;
+		this.tx = x;
+		this.ty = y;
 		this.sx = sigmax;
 		this.sy = sigmay;
 		this.area = area;

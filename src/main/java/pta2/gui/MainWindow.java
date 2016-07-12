@@ -74,7 +74,7 @@ public class MainWindow extends JFrame {
 	SingleTrackObject to;
 	
 	public MainWindow(final ImagePlus imp, final List<List<TrackPoint>> tracklist) {
-		setBounds(new Rectangle(500, 220, 550, 200));
+		setBounds(new Rectangle(500, 220, 550, 250));
 		setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
 		this.imp = imp;
 		//this.tracklist = tracklist;
@@ -168,7 +168,18 @@ public class MainWindow extends JFrame {
 		JPanel DetectionPanel = new JPanel();
 		TrackPanel.add(DetectionPanel);
 		DetectionPanel.setBorder(new TitledBorder(new EtchedBorder(EtchedBorder.LOWERED, null, null), "Localization", TitledBorder.LEADING, TitledBorder.TOP, null, new Color(0, 0, 0)));
-		DetectionPanel.setLayout(new GridLayout(0, 1, 0, 0));
+		DetectionPanel.setLayout(new GridLayout(4, 1, 0, 0));
+		
+		JRadioButton FindMaxima_RadioButton = new JRadioButton("Find Maxima");
+		FindMaxima_RadioButton.setSelected(true);
+		DetectionPanel.add(FindMaxima_RadioButton);
+		FindMaxima_RadioButton.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				method = 4;
+			}
+		});
+		methodButtonGroup.add(FindMaxima_RadioButton);
+		FindMaxima_RadioButton.setFont(new Font("Lucida Grande", Font.PLAIN, 13));
 		
 		JRadioButton Centroid_RadioButton = new JRadioButton("Centroid");
 		DetectionPanel.add(Centroid_RadioButton);
@@ -177,7 +188,6 @@ public class MainWindow extends JFrame {
 				method = 0;
 			}
 		});
-		Centroid_RadioButton.setSelected(true);
 		methodButtonGroup.add(Centroid_RadioButton);
 		Centroid_RadioButton.setFont(new Font("Lucida Grande", Font.PLAIN, 13));
 		

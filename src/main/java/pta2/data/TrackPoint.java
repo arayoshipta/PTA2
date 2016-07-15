@@ -9,18 +9,21 @@ public class TrackPoint {
 
 	public double tx, ty;
 	public TrackPoint preTp;
+	public TrackPoint postTp;
 	public int frame;
 	public double mean;
 	public double area;
-	public double sx, sy; // sigma x, sigma y
-	public int ite; // number of itteration
+	public double sx = 0, sy = 0; // sigma x, sigma y
+	public int ite = 0; // number of itteration
 	public double circ;
 	public int roisize;
-	public double offset;
+	public double offset = 0;
+	public boolean np = false;
 	
 	public TrackPoint() {
 		this.tx = 0;
 		this.ty = 0;
+		this.np = true;
 	}
 	
 	public TrackPoint(double x, double y, double peakIntensity, int frame, int roisize) {
@@ -44,7 +47,7 @@ public class TrackPoint {
 	}
 	
 	public TrackPoint(double x, double y, double sigmax, double sigmay, 
-			double area, double mean, double circ, int frame, int roisize) {
+			double area, double mean, double circ, int frame, int roisize, int iteration) {
 		this.tx = x;
 		this.ty = y;
 		this.sx = sigmax;
@@ -54,9 +57,10 @@ public class TrackPoint {
 		this.frame = frame;
 		this.circ = circ;
 		this.roisize = roisize;
+		this.ite = iteration;
 	}
 	
-	public static double calcDistance(TrackPoint fp, TrackPoint sp, int[] param, int searchrange, Calibration cal) {
+	public static double calcDistance(TrackPoint fp, TrackPoint sp, int[] param, Calibration cal) {
 		/*
 		 * fp: first point
 		 * sp: second point
@@ -65,10 +69,7 @@ public class TrackPoint {
 		EuclideanDistance ed = new EuclideanDistance();  // calculate euclideanDistance
 		double d = ed.compute(new double[]{fp.tx, fp.ty}, new double[]{sp.tx, sp.ty});
 		d = d / cal.pixelWidth;  // convert to pixel value
-		if (Math.sqrt(d) > searchrange) {
-			IJ.log("d = " + d);
-			return 0;
-		}
+
 		d += param[0] * (fp.mean - sp.mean) * (fp.mean - sp.mean);
 		d += param[1] * (fp.area - sp.area) * (fp.area - sp.area);
 		if(fp.preTp != null && param[2] == 1) {

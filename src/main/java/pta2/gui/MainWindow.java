@@ -75,7 +75,7 @@ public class MainWindow extends JFrame {
 	
 	public MainWindow(final ImagePlus imp, final List<List<TrackPoint>> tracklist) {
 		setBounds(new Rectangle(500, 220, 550, 250));
-		setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
+		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		this.imp = imp;
 		//this.tracklist = tracklist;
 		
@@ -267,6 +267,7 @@ public class MainWindow extends JFrame {
 		});
 		
 		ROICheckBox = new JCheckBox("ROI");
+		ROICheckBox.setSelected(true);
 		ROICheckBox.setToolTipText("Show squrare ROI\n");
 		AppearancePanel2.add(ROICheckBox);
 		ROICheckBox.addActionListener(new ActionListener () {
@@ -279,6 +280,7 @@ public class MainWindow extends JFrame {
 		});
 		
 		NumberCheckBox = new JCheckBox("Number");
+		NumberCheckBox.setSelected(true);
 		NumberCheckBox.setToolTipText("Show number of each track");
 		AppearancePanel2.add(NumberCheckBox);
 		NumberCheckBox.addActionListener(new ActionListener () {
@@ -318,7 +320,7 @@ public class MainWindow extends JFrame {
 		lblSearchRangepixels.setToolTipText("The length of the side of a square ROI which limits the search range to find next object. ");
 		DetectionParamPanel.add(lblSearchRangepixels);
 		
-		searchrange = new SpinnerNumberModel(30, 5, 100, 1);
+		searchrange = new SpinnerNumberModel(3, 1, 100, 1);
 		JSpinner SearchRange = new JSpinner(searchrange);
 		SearchRange.setToolTipText("The length of the side of a square ROI which limits the search range to find next object. ");
 		SearchRange.addChangeListener(new ChangeListener() {

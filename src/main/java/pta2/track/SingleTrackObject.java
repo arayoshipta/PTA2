@@ -178,7 +178,7 @@ public class SingleTrackObject extends Thread implements Measurements{
 			double score = 10000000.0D;
 			TrackPoint nexttp = null;
 			for(TrackPoint candtp: templist) {
-				double tempscore = TrackPoint.calcDistance(cp, candtp, param, searchrange, cal);
+				double tempscore = TrackPoint.calcDistance(cp, candtp, param, cal);
 				if (tempscore == 0) {
 					IJ.log("3. search failed");
 					return false;

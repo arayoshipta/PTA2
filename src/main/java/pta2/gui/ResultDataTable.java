@@ -24,6 +24,7 @@ import javax.swing.table.TableCellEditor;
 import javax.swing.table.TableModel;
 import javax.swing.table.TableRowSorter;
 
+import ij.IJ;
 import ij.ImagePlus;
 import ij.WindowManager;
 import ij.measure.Calibration;
@@ -168,6 +169,7 @@ public class ResultDataTable extends JFrame {
 		public void valueChanged(ListSelectionEvent e) {
 			if(e.getValueIsAdjusting()) return; // to avoid overlapping procedure
 			int index = jt.convertRowIndexToModel(jt.getSelectedRow());
+			IJ.log("index = " + index);
 			selectedlist = jt.getSelectedRows();
 			for (int ind = 0; ind < selectedlist.length; ind++) 
 				selectedlist[ind] = jt.convertRowIndexToModel(selectedlist[ind]);
@@ -189,7 +191,7 @@ public class ResultDataTable extends JFrame {
 	}
 	
 	public Color getDataofColor(int index) {
-		Object col = jt.getValueAt(jt.convertColumnIndexToView(index), 8);
+		Object col = jt.getValueAt(jt.convertRowIndexToView(index), 8);
 		if(col instanceof String)
 			return Color.cyan;
 		else

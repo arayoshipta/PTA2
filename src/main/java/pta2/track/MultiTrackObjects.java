@@ -67,6 +67,8 @@ public class MultiTrackObjects extends Thread implements Measurements{
 			int f = startframe;
 			List<List<TrackPoint>> allp = new ArrayList<List<TrackPoint>>(totalframe - startframe);
 			IJ.log("Start Multiple Tracking");
+			PTA2.isTracking = true;
+
 			Roi arearoi = imp.getRoi();
 			do {
 				imp.setT(f); // move to frame
@@ -83,6 +85,7 @@ public class MultiTrackObjects extends Thread implements Measurements{
 				f++;
 			} while (f <= totalframe);
 			IJ.log("End of Multiple Tracking");
+			PTA2.isTracking = false;
 			imp.deleteRoi();
 			tracklist = findlinkage(allp);
 			PTA2.setTrackList(tracklist);

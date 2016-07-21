@@ -69,16 +69,13 @@ public class MainWindow extends JFrame {
 	private JCheckBox AllCheckBox;
 	private JCheckBox ROICheckBox;
 	private JCheckBox NumberCheckBox;
-	//public List<List<TrackPoint>> tracklist;
 	
 	SingleTrackObject to;
 	
-	public MainWindow(final ImagePlus imp, final List<List<TrackPoint>> tracklist) {
+	public MainWindow() {
 		setBounds(new Rectangle(500, 220, 550, 250));
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		this.imp = imp;
-		//this.tracklist = tracklist;
-		
+				
 		setTitle("PTA2");
 		setResizable(false);
 		getContentPane().setLayout(new GridLayout(1, 2, 0, 0));
@@ -101,10 +98,13 @@ public class MainWindow extends JFrame {
 
 			@Override
 			public void actionPerformed(ActionEvent e) {
+				imp = WindowManager.getCurrentImage();
 				MaximumFinder mf = new MaximumFinder();
 				Polygon mp = mf.getMaxima(imp.getProcessor(), (Double)tol.getValue(), true);
 				DrawRois dr = new DrawRois(imp, mp, (Integer)roisize.getValue());
+				PTA2.isTracking = true;
 				dr.show();
+				PTA2.isTracking = false;
 			}
 			
 		});
@@ -112,6 +112,7 @@ public class MainWindow extends JFrame {
 		JButton DoTrackButton = new JButton("Multi Track");
 		DoTrackButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
+				imp = WindowManager.getCurrentImage();
 				Roi currentRoi = imp.getRoi();
 				int roitype = 0;
 				if (currentRoi != null)
@@ -145,7 +146,7 @@ public class MainWindow extends JFrame {
 					yesnotrack.enableYesNoCancel();
 					yesnotrack.showDialog();
 					if(yesnotrack.wasOKed()) {
-						MultiTrackObjects mto = new MultiTrackObjects(imp, method, param, tol, roisize, searchrange, tracklist);
+						MultiTrackObjects mto = new MultiTrackObjects(imp, method, param, tol, roisize, searchrange, PTA2.tracklist);
 						mto.start();
 					}
 				}

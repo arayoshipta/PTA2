@@ -44,7 +44,7 @@ public class ResultDataTable extends JFrame {
 	public JTable jt;
 	public List<List<TrackPoint>> tracklist;
 	private Calibration cal;
-	private ImagePlus imp;
+	public ImagePlus imp;
 	private ResultDataTable rdt;
 	public int[] selectedlist;
 	private ChartFrame cframe;
@@ -127,7 +127,8 @@ public class ResultDataTable extends JFrame {
 			jt.getSelectionModel().addListSelectionListener(this);
 			JScrollPane tablePane = new JScrollPane(jt);
 			pane.add(tablePane, BorderLayout.CENTER);
-			
+		
+			// Add menu items
 			JMenuBar menubar = new JMenuBar();
 			frame.setJMenuBar(menubar);
 			// File menu
@@ -159,6 +160,16 @@ public class ResultDataTable extends JFrame {
 			concatenateTrack.addActionListener(new EditTrackAction(imp, rdt));
 			edit.add(concatenateTrack);
 			
+			// Plot menu
+			JMenu analyze = new JMenu("Analyze");
+			menubar.add(analyze);
+			JMenuItem scatterplot = new JMenuItem("Scatter Plot");
+			scatterplot.addActionListener(new AnalyzeMenuAction(imp, rdt));
+			analyze.add(scatterplot);
+			JMenuItem smzi = new JMenuItem("Show multi-Z intensities");
+			smzi.addActionListener(new AnalyzeMenuAction(imp, rdt));
+			analyze.add(smzi);
+			
 			frame.setVisible(true);
 			frame.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
 			WindowManager.addWindow((Frame)frame);
@@ -180,10 +191,10 @@ public class ResultDataTable extends JFrame {
 				if (cframe == null) {
 					cframe = new ChartFrame(imp, tracklist.get(index));
 					PTA2.setcframe(cframe);
-				}
-				else
+				} else
 					cframe.drawTrajectory(tracklist.get(index));
-			}
+			} else
+				return;
 			cframe.setVisible(true);
 			imp.setT(tracklist.get(index).get(0).frame); // set imp to first track frame
 		}

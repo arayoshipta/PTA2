@@ -42,6 +42,7 @@ public class PTA2 extends PlugInFrame {
 	public static int searchrange = 12;
 	private static ResultDataTable rdt;
 	private static ChartFrame cframe;
+	public static boolean isTracking = false;
 	private ImageListener listener;
 	public static int[] selectedlist;
 
@@ -68,7 +69,7 @@ public class PTA2 extends PlugInFrame {
 		// if the image is already opened
 		if (imp != null) {
 			ImageProcessor ip = imp.getProcessor();
-			mw = new MainWindow(imp, tracklist);
+			mw = new MainWindow();
 			mw.setVisible(true);
 			tracklist = new ArrayList<List<TrackPoint>>(100);  // for data storage
 
@@ -97,11 +98,16 @@ public class PTA2 extends PlugInFrame {
 				public void imageUpdated(ImagePlus arg0) {
 					if(selectedlist == null) {
 						return;
-					}
-					
+					}					
 					if(selectedlist.length < 1)
 						return;
+					if(arg0 != rdt.imp)
+						return;
 					imp = arg0;
+					
+					if (isTracking)
+						return;
+					
 					Overlay tempol = new Overlay();
 					int focusedlistlen = mw.isAllTrack()?tracklist.size():selectedlist.length;
 					for(int slist = 0;slist < focusedlistlen;slist++) {

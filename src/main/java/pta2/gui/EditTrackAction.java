@@ -62,12 +62,17 @@ public class EditTrackAction extends AbstractAction {
 			selectedlist[ind] = jt.convertRowIndexToModel(selectedlist[ind]);
 		List<TrackPoint> track1 = tracklist.get(selectedlist[0]);
 		List<TrackPoint> track2 = tracklist.get(selectedlist[1]);
+		if (track1.get(track1.size() - 1).frame >= track2.get(0).frame ||
+				track1.get(0).frame >= track2.get(track2.size() - 1).frame) {
+			IJ.error("These tracks are overlapped.\n");
+			return;
+		}
 		GenericDialog concateRows = new GenericDialog("Concatenete rows");
 		concateRows.addMessage("Do you want to concatenate track #" + selectedlist[0] + " and #" + selectedlist[1] + " tracks?");
-		//concateRows.addCheckbox("Interporate?", true);
+		concateRows.addCheckbox("Interporate?", true);
 		concateRows.enableYesNoCancel();
 		concateRows.showDialog();
-		//boolean interp = concateRows.getNextBoolean();
+		boolean interp = concateRows.getNextBoolean();
 		List<TrackPoint> concateTrack = new ArrayList<TrackPoint>(track1.size() + track2.size());
 		List<TrackPoint> firsttrack, secondtrack;
 		if(track1.get(0).frame < track2.get(0).frame) {
@@ -79,8 +84,28 @@ public class EditTrackAction extends AbstractAction {
 		}
 		IJ.log("firsttrack = " + firsttrack.toString());
 		IJ.log("secondtrack = " + secondtrack.toString());
+		
 		for(TrackPoint ft: firsttrack) {
-				concateTrack.add(ft);
+			concateTrack.add(ft);
+		}
+		
+		if(interp) {
+			TrackPoint lpft = firsttrack.get(firsttrack.size() - 1);  // lpft: last trackpoint of first track
+			TrackPoint fpst = secondtrack.get(0);  // fpst: first trackpoint of second track
+			int lfft = lpft.frame; //lfft: last frame of first track
+			int ffst = fpst.frame; //ffst: first frame of second track
+			int flen = ffst - lfft;
+			double dx = (lpft.tx + fpst.tx) / (double)flen;
+			double dy = (lpft.ty + fpst.ty) / (double)flen;
+			double darea = (lpft.area - fpst.area) / (double)flen;
+			double dmean = (lpft.mean - fpst.mean) / (double)flen;
+			double dcirc = (lpft.circ - fpst.circ) / (double)flen;
+			for (int ip = 1;ip < flen;ip++) {
+				//TrackPoint(double x, double y, double area, double mean, double circ, int frame, int roisize)
+				TrackPoint inttp = new TrackPoint(lpft.tx + dx * ip, lpft.ty + dy * ip, lpft.area + darea * ip,
+						lpft.mean + dmean * ip, lpft.circ + dcirc * ip, lpft.frame + ip, lpft.roisize);
+				concateTrack.add(inttp);
+			}
 		}
 		
 		int cnt = 0;

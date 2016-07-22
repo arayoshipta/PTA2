@@ -69,6 +69,8 @@ public class SaveDataAction extends AbstractAction {
 				List<TrackPoint> tmpPlist;
 				List<List<TrackPoint>> tracklist = rdt.tracklist;
 				JTable jt = rdt.jt;
+				
+				pw.println("Point Frame x y sx sy intensity integ.int offset area itteration velocity msd cost");
 				for(int index = 0; index < tracklist.size(); index++) {
 					tmpPlist = tracklist.get(jt.convertRowIndexToModel(index));
 					writePointData(tracklist, tmpPlist, pw);
@@ -88,6 +90,8 @@ public class SaveDataAction extends AbstractAction {
 				List<TrackPoint> tmpPlist;
 				List<List<TrackPoint>> tracklist = rdt.tracklist;
 				int[] selectedlist = rdt.selectedlist;
+
+				pw.println("Point Frame x y sx sy intensity integ.int offset area itteration velocity msd cost");
 				for(int index = 0; index < selectedlist.length; index++) {
 					tmpPlist = tracklist.get(selectedlist[index]);
 					writePointData(tracklist, tmpPlist, pw);
@@ -107,6 +111,8 @@ public class SaveDataAction extends AbstractAction {
 				List<TrackPoint> tmpPlist;
 				List<List<TrackPoint>> tracklist = rdt.tracklist;
 				JTable jt = rdt.jt;
+				
+				pw.println("Point Frame x y sx sy intensity integ.int offset area itteration velocity msd cost");
 
 				for(int index = 0; index < tracklist.size(); index++) {
 					if((Boolean) jt.getValueAt(index, 7) == Boolean.TRUE) {
@@ -162,7 +168,6 @@ public class SaveDataAction extends AbstractAction {
 	private void writePointData(List<List<TrackPoint>> plist, List<TrackPoint> tmpPlist, 
 			PrintWriter pw) throws IOException {
 		//pw.println(String.format("#Point:%d -- -- -- -- -- -- -- --",plist.indexOf(tmpPlist)));
-		pw.println("Point Frame x y intensity area velocity msd cost");
 		int frame = 0;
 		int cnt = 0;
 		int pnum = plist.indexOf(tmpPlist);
@@ -175,9 +180,9 @@ public class SaveDataAction extends AbstractAction {
 			}
 			if (cnt > 1)
 				cost = String.valueOf(at.cost[cnt - 2]);
-			pw.println(String.format("%d %d %f %f %f %f %s %s %s", 
-					pnum, tmpP.frame, tmpP.tx, tmpP.ty,
-					tmpP.mean, tmpP.area, 
+			pw.println(String.format("%d %d %f %f %f %f %f %f %f %f %d %s %s %s", 
+					pnum, tmpP.frame, tmpP.tx, tmpP.ty, tmpP.sx, tmpP.sy,
+					tmpP.mean, tmpP.integint, tmpP.offset, tmpP.area, tmpP.ite,  
 					vel, msd, cost));
 			frame = tmpP.frame;
 			cnt++;

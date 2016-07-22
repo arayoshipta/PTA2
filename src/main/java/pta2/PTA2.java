@@ -10,6 +10,7 @@ import pta2.gui.*;
 
 import java.awt.Font;
 import java.awt.Frame;
+import java.awt.event.WindowEvent;
 import java.awt.geom.GeneralPath;
 import java.util.ArrayList;
 import java.util.List;
@@ -205,5 +206,10 @@ public class PTA2 extends PlugInFrame {
 	
 	public static void setcframe(ChartFrame cf) {
 		cframe = cf;
+	}
+	
+	@Override
+	public void windowClosed(WindowEvent e) {
+		IJ.log("Window closed");
 	}
 }

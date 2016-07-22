@@ -82,8 +82,6 @@ public class EditTrackAction extends AbstractAction {
 			firsttrack = track2;
 			secondtrack = track1;
 		}
-		IJ.log("firsttrack = " + firsttrack.toString());
-		IJ.log("secondtrack = " + secondtrack.toString());
 		
 		for(TrackPoint ft: firsttrack) {
 			concateTrack.add(ft);
@@ -95,18 +93,21 @@ public class EditTrackAction extends AbstractAction {
 			int lfft = lpft.frame; //lfft: last frame of first track
 			int ffst = fpst.frame; //ffst: first frame of second track
 			int flen = ffst - lfft;
-			double dx = (lpft.tx + fpst.tx) / (double)flen;
-			double dy = (lpft.ty + fpst.ty) / (double)flen;
-			double darea = (lpft.area - fpst.area) / (double)flen;
-			double dmean = (lpft.mean - fpst.mean) / (double)flen;
-			double dinte = (lpft.integint - fpst.integint) / (double)flen;
-			double dcirc = (lpft.circ - fpst.circ) / (double)flen;
+			double dx =  - (lpft.tx - fpst.tx) / (double)flen;
+			double dy =  - (lpft.ty - fpst.ty) / (double)flen;
+			double darea =  - (lpft.area - fpst.area) / (double)flen;
+			double dmean =  - (lpft.mean - fpst.mean) / (double)flen;
+			double dinte =  - (lpft.integint - fpst.integint) / (double)flen;
+			double dcirc =  - (lpft.circ - fpst.circ) / (double)flen;
+			TrackPoint preTp = concateTrack.get(concateTrack.size() - 1);
 			for (int ip = 1;ip < flen;ip++) {
 				//TrackPoint(double x, double y, double area, double mean, double circ, int frame, int roisize)
 				TrackPoint inttp = new TrackPoint(lpft.tx + dx * ip, lpft.ty + dy * ip, lpft.area + darea * ip,
 						lpft.mean + dmean * ip, lpft.integint + dinte * ip, 
 						lpft.circ + dcirc * ip, lpft.frame + ip, lpft.roisize);
+				inttp.preTp = preTp;  // link previous point to current point
 				concateTrack.add(inttp);
+				preTp = inttp;
 			}
 		}
 		
@@ -129,7 +130,7 @@ public class EditTrackAction extends AbstractAction {
 		int currentframe = imp.getFrame();
 		List<TrackPoint> editTrack = tracklist.get(index);
 		int startframe = editTrack.get(0).frame;
-		int endframe = editTrack.get(editTrack.size() - 1).frame;
+		//int endframe = editTrack.get(editTrack.size() - 1).frame;
 		GenericDialog splitRow = new GenericDialog("Split Track?");
 		splitRow.addMessage("Are you sure delete #" + index + " Track in this frame?");
 		splitRow.enableYesNoCancel();

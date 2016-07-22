@@ -189,13 +189,15 @@ public class MultiTrackObjects extends Thread implements Measurements{
 				if (methods == 4) { // Find maxima
 					tp = new TrackPoint(x * cal.pixelWidth, y * cal.pixelHeight, val, integint, currentframe, roisize);
 					p++;
+					tmpl.add(tp);
 					continue;
 				}
 				
 				Wand wand = new Wand(ip);
-				wand.autoOutline((int)x, (int)y, lt, ut);
+				wand.autoOutline((int)(x * cal.pixelWidth), (int)(y * cal.pixelHeight), lt, ut);
 				Roi wandRoi = new PolygonRoi(wand.xpoints, wand.ypoints, wand.npoints, Roi.POLYGON);
 				imp.setRoi(wandRoi);
+				
 				if (methods == 0) { // Centroid tracking
 					is = imp.getStatistics(AREA + CENTROID + CIRCULARITY + MEAN);
 					cx = is.xCentroid; cy = is.yCentroid;
@@ -235,7 +237,8 @@ public class MultiTrackObjects extends Thread implements Measurements{
 							(double)is.min			// offset		
 					};
 					TwoDGaussProblem tdgp = new TwoDGaussProblem(inputdata, newStart, roisize, new int[] {1000, 1000});
-				
+					boolean notfit = false;
+					
 					try{
 						//do LevenbergMarquardt optimization and get optimized parameters
 						Optimum opt = tdgp.fit2dGauss();
@@ -252,8 +255,16 @@ public class MultiTrackObjects extends Thread implements Measurements{
 					} catch (Exception e) {
 						//IJ.log("cx="+cx+", cy="+cy+", mean="+mean+", offset="+offset+", sx="+sx+", sy="+sy);
 						//IJ.log(e.toString());
+						notfit = true;
 					}
-					tp = new TrackPoint(cx, cy, sx, sy, is.area, mean, integint, is.CIRCULARITY, currentframe, roisize, iteration);
+					if(!notfit) {
+						tp = new TrackPoint(cx, cy, sx, sy, is.area, mean, integint, offset, 
+								is.CIRCULARITY, currentframe, roisize, iteration);
+					} else {
+						tp = new TrackPoint(is.xCenterOfMass, is.yCenterOfMass, 0, 0, is.area, is.mean, integint, 0,
+								is.CIRCULARITY, currentframe, roisize, 1000);
+					}
+					
 				}
 				tmpl.add(tp);
 				p++;

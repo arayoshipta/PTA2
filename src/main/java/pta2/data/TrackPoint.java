@@ -50,7 +50,7 @@ public class TrackPoint {
 	}
 	
 	public TrackPoint(double x, double y, double sigmax, double sigmay, 
-			double area, double mean, double integint, double circ, int frame, int roisize, int iteration) {
+			double area, double mean, double integint, double offset, double circ, int frame, int roisize, int iteration) {
 		this.tx = x;
 		this.ty = y;
 		this.sx = sigmax;

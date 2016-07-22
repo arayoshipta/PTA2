@@ -74,7 +74,7 @@ public class MainWindow extends JFrame {
 	
 	public MainWindow() {
 		setBounds(new Rectangle(500, 220, 550, 250));
-		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
 				
 		setTitle("PTA2");
 		setResizable(false);
@@ -378,5 +378,5 @@ public class MainWindow extends JFrame {
 	public boolean isNumTrack() {
 		return NumberCheckBox.isSelected();
 	}
-			
+	
 }

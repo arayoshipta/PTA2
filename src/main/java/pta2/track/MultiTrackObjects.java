@@ -156,7 +156,7 @@ public class MultiTrackObjects extends Thread implements Measurements{
 			Calibration cal = imp.getCalibration();
 			int currentframe = imp.getFrame();
 			double mean = 0;
-			double roiInt = 0;
+			double integint = 0;
 			double offset = 0;
 			double cx = 0, cy = 0; // center of x,y
 			double sx = 0, sy = 0; // sigma x,y
@@ -172,9 +172,22 @@ public class MultiTrackObjects extends Thread implements Measurements{
 					p++;
 					continue; // skip points
 				}
+				// calculate integrated intensity in ROI
+				ImageStatistics is = imp.getStatistics(CENTROID + RECT);
+				double xx = is.xCentroid - cal.pixelWidth * (double)roisize / 2.0D;
+				double yy = is.yCentroid - cal.pixelHeight * (double)roisize / 2.0D;
+				int ixx = (int)(xx / cal.pixelWidth);
+				int iyy = (int)(yy / cal.pixelHeight);				
+
+				
+				Roi sqroi = new Roi((int)(x * cal.pixelWidth - roisize / 2), (int)(y * cal.pixelHeight - roisize / 2), 
+						roisize, roisize);
+				imp.setRoi(sqroi);
+				is = imp.getStatistics(MEAN + INTEGRATED_DENSITY);
+				integint = is.mean * is.longPixelCount; // integrated intensity
 				
 				if (methods == 4) { // Find maxima
-					tp = new TrackPoint(x * cal.pixelWidth, y * cal.pixelHeight, val, currentframe, roisize);
+					tp = new TrackPoint(x * cal.pixelWidth, y * cal.pixelHeight, val, integint, currentframe, roisize);
 					p++;
 					continue;
 				}
@@ -183,25 +196,18 @@ public class MultiTrackObjects extends Thread implements Measurements{
 				wand.autoOutline((int)x, (int)y, lt, ut);
 				Roi wandRoi = new PolygonRoi(wand.xpoints, wand.ypoints, wand.npoints, Roi.POLYGON);
 				imp.setRoi(wandRoi);
-				ImageStatistics is = imp.getStatistics(CENTROID + RECT);
 				if (methods == 0) { // Centroid tracking
 					is = imp.getStatistics(AREA + CENTROID + CIRCULARITY + MEAN);
 					cx = is.xCentroid; cy = is.yCentroid;
 					mean = is.mean;
-					tp = new TrackPoint(cx, cy, is.area, mean, is.CIRCULARITY, currentframe, roisize);
+					tp = new TrackPoint(cx, cy, is.area, mean, integint, is.CIRCULARITY, currentframe, roisize);
 				} else if (methods == 1) { //CENTER OF MASS
 					is = imp.getStatistics(AREA + CENTER_OF_MASS + CIRCULARITY + MEAN);
 					cx = is.xCenterOfMass; cy = is.yCenterOfMass;
 					mean = is.mean;
-					tp = new TrackPoint(cx, cy, is.area, mean, is.CIRCULARITY, currentframe, roisize);
+					tp = new TrackPoint(cx, cy, is.area, mean, integint, is.CIRCULARITY, currentframe, roisize);
 				} else if (methods == 2) { //2D Gaussian
-					FloatProcessor fip = ip.convertToFloatProcessor();
-					float[] pixVal = (float[])fip.getPixels();
 					is = imp.getStatistics(AREA + CENTROID + CIRCULARITY + MEAN);
-					double xx = is.xCentroid - cal.pixelWidth * (double)roisize / 2.0D;
-					double yy = is.yCentroid - cal.pixelHeight * (double)roisize / 2.0D;
-					int ixx = (int)(xx / cal.pixelWidth);
-					int iyy = (int)(yy / cal.pixelHeight);
 					
 					// if roi is out of image bound
 					if(ixx < 0 || iyy < 0 ||(ixx + roisize) > imp.getWidth() || (iyy + roisize) > imp.getWidth())
@@ -209,17 +215,17 @@ public class MultiTrackObjects extends Thread implements Measurements{
 						p++;
 						continue;
 					}
-					
+					FloatProcessor fip = ip.convertToFloatProcessor();
 					double[] inputdata = new double[roisize * roisize];
-				
+					float[] pixVal = (float[])fip.getPixels();
 					for(int ii = 0;ii < roisize * roisize; ii++) {
 						// x position is mod (count (ii), y number )
 						// y position is count / x size number
 						int ix = ii % roisize, iy = ii / roisize;
 						double tmpval = (double)pixVal[ixx + ix + (iyy + iy) * imp.getWidth()];
 						inputdata[ix + iy * roisize] = tmpval;
-						roiInt += tmpval;
-					}
+						integint += tmpval;
+					}				
 					double[] newStart = {  // initial values for 2D Gaussian fitting
 							(double)is.max,			// intensity
 							(double)roisize / 2D,	// x
@@ -247,7 +253,7 @@ public class MultiTrackObjects extends Thread implements Measurements{
 						//IJ.log("cx="+cx+", cy="+cy+", mean="+mean+", offset="+offset+", sx="+sx+", sy="+sy);
 						//IJ.log(e.toString());
 					}
-					tp = new TrackPoint(cx, cy, sx, sy, is.area, mean, is.CIRCULARITY, currentframe, roisize, iteration);
+					tp = new TrackPoint(cx, cy, sx, sy, is.area, mean, integint, is.CIRCULARITY, currentframe, roisize, iteration);
 				}
 				tmpl.add(tp);
 				p++;

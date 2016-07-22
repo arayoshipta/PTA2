@@ -71,45 +71,48 @@ public class SingleTrackObject extends Thread implements Measurements{
 		ImageStatistics is = imp.getStatistics();
 		int currentframe = imp.getFrame();
 		double mean = 0;
-		double roiInt = 0;
+		double integint = 0;
 		double offset = 0;
 		double sx = 0, sy = 0;
 		int itteration = 0;
+		
+		ImageProcessor ip = imp.getProcessor();
+		FloatProcessor fip = ip.convertToFloatProcessor();
+		float[] pixVal = (float[])fip.getPixels();
+		is = imp.getStatistics(AREA + CENTROID + CIRCULARITY + MEAN);
+		double xx = is.xCentroid - cal.pixelWidth * (double)roisize / 2.0D;
+		double yy = is.yCentroid - cal.pixelHeight * (double)roisize / 2.0D;
+		int ixx = (int)(xx / cal.pixelWidth);
+		int iyy = (int)(yy / cal.pixelHeight);
+		double[] inputdata = new double[roisize * roisize];
+		for(int ii = 0;ii < roisize * roisize; ii++) {
+			// x position is mod (count (ii), y number )
+			// y position is count / x size number
+			int ix = ii % roisize, iy = ii / roisize;
+			double tmpval = (double)pixVal[ixx + ix + (iyy + iy) * imp.getWidth()];
+			inputdata[ix + iy * roisize] = tmpval;
+			integint += tmpval;
+		}
 		
 		TrackPoint tp;
 		if (method == 0) { // Centroid tracking
 			is = imp.getStatistics(AREA + CENTROID + CIRCULARITY + MEAN);
 			cx = is.xCentroid; cy = is.yCentroid;
 			mean = is.mean;
-			tp = new TrackPoint(cx, cy, is.area, mean, is.CIRCULARITY, currentframe, roisize);
+			tp = new TrackPoint(cx, cy, is.area, mean, integint, is.CIRCULARITY, currentframe, roisize);
 
 		} else if (method == 1) { //CENTER OF MASS
 			is = imp.getStatistics(AREA + CENTER_OF_MASS + CIRCULARITY + MEAN);
 			cx = is.xCenterOfMass; cy = is.yCenterOfMass;
 			mean = is.mean;
-			tp = new TrackPoint(cx, cy, is.area, mean, is.CIRCULARITY, currentframe, roisize);
+			tp = new TrackPoint(cx, cy, is.area, mean, integint, is.CIRCULARITY, currentframe, roisize);
 
 		} else if (method == 2) { //2D Gaussian
-			ImageProcessor ip = imp.getProcessor();
-			FloatProcessor fip = ip.convertToFloatProcessor();
-			float[] pixVal = (float[])fip.getPixels();
-			is = imp.getStatistics(AREA + CENTROID + CIRCULARITY + MEAN);
-			double xx = is.xCentroid - cal.pixelWidth * (double)roisize / 2.0D;
-			double yy = is.yCentroid - cal.pixelHeight * (double)roisize / 2.0D;
-			int ixx = (int)(xx / cal.pixelWidth);
-			int iyy = (int)(yy / cal.pixelHeight);
-			double[] inputdata = new double[roisize * roisize];
+
 			
-			for(int ii = 0;ii < roisize * roisize; ii++) {
-				// x position is mod (count (ii), y number )
-				// y position is count / x size number
-				int ix = ii % roisize, iy = ii / roisize;
-				double tmpval = (double)pixVal[ixx + ix + (iyy + iy) * imp.getWidth()];
-				inputdata[ix + iy * roisize] = tmpval;
-				roiInt += tmpval;
-			}
+
 			double[] newStart = {  // initial values for 2D Gaussian fitting
-				(double)roiInt,			// intensity
+				(double)is.max,			// intensity
 				(double)roisize / 2D,	// x
 				(double)roisize / 2D,	// y
 				(double)roisize / 10D,	// sigma x
@@ -147,7 +150,7 @@ public class SingleTrackObject extends Thread implements Measurements{
 			}
 
 		}
-		tp = new TrackPoint(cx, cy, is.area, mean, is.CIRCULARITY, currentframe, roisize);
+		tp = new TrackPoint(cx, cy, is.area, mean, integint, is.CIRCULARITY, currentframe, roisize);
 		tp.sx = sx;
 		tp.sy = sy;
 		tp.ite = itteration;

@@ -99,11 +99,13 @@ public class EditTrackAction extends AbstractAction {
 			double dy = (lpft.ty + fpst.ty) / (double)flen;
 			double darea = (lpft.area - fpst.area) / (double)flen;
 			double dmean = (lpft.mean - fpst.mean) / (double)flen;
+			double dinte = (lpft.integint - fpst.integint) / (double)flen;
 			double dcirc = (lpft.circ - fpst.circ) / (double)flen;
 			for (int ip = 1;ip < flen;ip++) {
 				//TrackPoint(double x, double y, double area, double mean, double circ, int frame, int roisize)
 				TrackPoint inttp = new TrackPoint(lpft.tx + dx * ip, lpft.ty + dy * ip, lpft.area + darea * ip,
-						lpft.mean + dmean * ip, lpft.circ + dcirc * ip, lpft.frame + ip, lpft.roisize);
+						lpft.mean + dmean * ip, lpft.integint + dinte * ip, 
+						lpft.circ + dcirc * ip, lpft.frame + ip, lpft.roisize);
 				concateTrack.add(inttp);
 			}
 		}

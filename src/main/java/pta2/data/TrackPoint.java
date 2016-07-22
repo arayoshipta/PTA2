@@ -12,6 +12,7 @@ public class TrackPoint {
 	public TrackPoint postTp;
 	public int frame;
 	public double mean;
+	public double integint;
 	public double area;
 	public double sx = 0, sy = 0; // sigma x, sigma y
 	public int ite = 0; // number of itteration
@@ -26,34 +27,37 @@ public class TrackPoint {
 		this.np = true;
 	}
 	
-	public TrackPoint(double x, double y, double peakIntensity, int frame, int roisize) {
+	public TrackPoint(double x, double y, double peakIntensity, double integint, int frame, int roisize) {
 		this.tx = x;
 		this.ty = y;
 		this.mean = peakIntensity;
+		this.integint = integint;
 		this.frame = frame;
 		this.circ = 1;
 		this.roisize = roisize;
 		this.area = roisize * roisize;
 	}
 
-	public TrackPoint(double x, double y, double area, double mean, double circ, int frame, int roisize) {
+	public TrackPoint(double x, double y, double area, double mean, double integint, double circ, int frame, int roisize) {
 		this.tx = x;
 		this.ty = y;
 		this.area = area;
 		this.mean = mean;
+		this.integint = integint;
 		this.frame = frame;
 		this.circ = circ;
 		this.roisize = roisize;
 	}
 	
 	public TrackPoint(double x, double y, double sigmax, double sigmay, 
-			double area, double mean, double circ, int frame, int roisize, int iteration) {
+			double area, double mean, double integint, double circ, int frame, int roisize, int iteration) {
 		this.tx = x;
 		this.ty = y;
 		this.sx = sigmax;
 		this.sy = sigmay;
 		this.area = area;
 		this.mean = mean;
+		this.integint = integint;
 		this.frame = frame;
 		this.circ = circ;
 		this.roisize = roisize;

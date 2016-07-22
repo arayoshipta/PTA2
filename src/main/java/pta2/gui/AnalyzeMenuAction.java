@@ -15,15 +15,20 @@ import ij.IJ;
 import ij.ImagePlus;
 import ij.gui.GenericDialog;
 import ij.gui.ProgressBar;
+import ij.gui.Roi;
 import ij.measure.Calibration;
+import ij.measure.Measurements;
+import ij.measure.ResultsTable;
 import ij.process.ImageProcessor;
+import ij.process.ImageStatistics;
+import pta2.PTA2;
 import pta2.data.TrackPoint;
 
 /**
  * @author araiY
  *
  */
-public class AnalyzeMenuAction extends AbstractAction {
+public class AnalyzeMenuAction extends AbstractAction implements Measurements {
 
 	private ImagePlus imp;
 	private ResultDataTable rdt;
@@ -66,8 +71,33 @@ public class AnalyzeMenuAction extends AbstractAction {
 	}
 
 	private void showmultizint() {
-		// TODO Auto-generated method stub
-		
+		GenericDialog gd = new GenericDialog("Show multi-Z intensities");
+		gd.addMessage("Show intensities at fixed position");
+		gd.addCheckbox("is only use points in first frame?", false);
+		gd.enableYesNoCancel();
+		gd.showDialog();
+		if(gd.wasCanceled())
+			return;
+		boolean isff = gd.getNextBoolean();
+		int tflen = imp.getNFrames();
+		int rsize = PTA2.roisize;
+		ResultsTable rt = new ResultsTable();
+		for(int f = 1; f < tflen; f++) {
+			imp.setT(f);
+			rt.incrementCounter();
+			for(int rows = 0; rows < numlen; rows++) {
+				List<TrackPoint> templist = rdt.tracklist.get(selectedlist[rows]);
+				TrackPoint fp = templist.get(0);
+				if (isff && fp.frame != 1)
+					continue;  // only use points in first frame
+				Roi r = new Roi((int)(fp.tx - rsize / 2), (int)(fp.ty - rsize / 2), rsize, rsize);
+				imp.setRoi(r);
+				ImageStatistics is = imp.getStatistics(MEAN + INTEGRATED_DENSITY);
+				double integint = is.mean * is.longPixelCount;
+				rt.addValue("Track:" + rows, integint);
+			}
+		}
+		rt.show("Multi Track Data");
 	}
 
 	private synchronized void scatterplot() {

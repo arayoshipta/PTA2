@@ -12,8 +12,10 @@ import javax.swing.SpinnerNumberModel;
 import org.apache.commons.math3.fitting.leastsquares.LeastSquaresOptimizer.Optimum;
 
 import ij.IJ;
+import ij.ImageJ;
 import ij.ImagePlus;
 import ij.gui.PolygonRoi;
+import ij.gui.ProgressBar;
 import ij.gui.Roi;
 import ij.gui.Wand;
 import ij.measure.Calibration;
@@ -38,21 +40,24 @@ public class MultiTrackObjects extends Thread implements Measurements{
 		private Integer roisize;
 		private Integer searchrange;
 		private List<List<TrackPoint>> tracklist;
+		public List<List<TrackPoint>> allp;
 		private long lt;
 		private long ut;
 		private Double tol;
 		private int[] param;
+		private boolean batchmode;
 		private static ResultDataTable rdt;
 
-		public MultiTrackObjects(ImagePlus imp, int methods, int param[], SpinnerNumberModel tol, SpinnerNumberModel roisize,
-				SpinnerNumberModel searchrange, List<List<TrackPoint>> tracklist) {
+		public MultiTrackObjects(ImagePlus imp, int methods, int param[], double tol, int roisize,
+				int searchrange, List<List<TrackPoint>> tracklist, boolean batchmode) {
 			this.imp = imp;
 			this.methods = methods;
 			this.param = param;
-			this.roisize = (Integer)roisize.getValue();
-			this.searchrange = (Integer)searchrange.getValue();
-			this.tol = (Double)tol.getValue();
+			this.roisize = roisize;
+			this.searchrange = searchrange;
+			this.tol = tol;
 			this.tracklist = tracklist;
+			this.batchmode = batchmode;
 			ImageProcessor ip = imp.getProcessor();
 			lt = Math.round(ip.getMinThreshold());
 			if(imp.getBitDepth()!=32)
@@ -65,11 +70,12 @@ public class MultiTrackObjects extends Thread implements Measurements{
 			int totalframe = imp.getNFrames();
 			int startframe = imp.getFrame();
 			int f = startframe;
-			List<List<TrackPoint>> allp = new ArrayList<List<TrackPoint>>(totalframe - startframe);
+			
+			allp = new ArrayList<List<TrackPoint>>(totalframe - startframe);
 			IJ.log("Start Multiple Tracking");
 			PTA2.isTracking = true;
-
 			Roi arearoi = imp.getRoi();
+			
 			do {
 				imp.setT(f); // move to frame
 				if(arearoi != null)
@@ -87,20 +93,20 @@ public class MultiTrackObjects extends Thread implements Measurements{
 			IJ.log("End of Multiple Tracking");
 			PTA2.isTracking = false;
 			imp.deleteRoi();
+			// Should be separated below command
 			tracklist = findlinkage(allp);
 			PTA2.setTrackList(tracklist);
 			rdt = PTA2.getRDT();
-			
-			if (rdt == null) {
-				rdt = new ResultDataTable(tracklist, imp);
-				PTA2.updateRDT(imp, rdt);
-			} else {
-				rdt.setVisible(false);
-				rdt.dispose(); // Destroy JFrame
-				rdt = new ResultDataTable(tracklist, imp);
+			if(!batchmode) {
+				if (rdt == null) {
+					rdt = new ResultDataTable(tracklist, imp);
+				} else {
+					rdt.setVisible(false);
+					rdt.dispose(); // Destroy JFrame
+					rdt = new ResultDataTable(tracklist, imp);
+				}
 				PTA2.updateRDT(imp, rdt);
 			}
-			PTA2.updateRDT(imp, rdt);
 		}
 
 		private synchronized List<List<TrackPoint>> findlinkage(List<List<TrackPoint>> allp) {
@@ -109,7 +115,6 @@ public class MultiTrackObjects extends Thread implements Measurements{
 			for (int ff = 0; ff < num - 1; ff++) {
 				List<TrackPoint> fpointslist = allp.get(ff);  // points list of first frames
 				List<TrackPoint> spointslist = allp.get(ff + 1); // points list of second frames
-				IJ.log("frame = " + ff);
 				for(TrackPoint fp: fpointslist) {
 					double distance = 100000000.0D;
 					TrackPoint sp = new TrackPoint();
@@ -122,12 +127,11 @@ public class MultiTrackObjects extends Thread implements Measurements{
 							sp = tempsp;
 						}
 					}
-					if (!sp.np && distance <= searchrange) {
+					if (!sp.np && TrackPoint.calcDistance(fp, sp, new int[]{0,0,0,0}, cal) <= searchrange) {
 						sp.preTp = fp;
 						fp.postTp = sp;
 						continue;
 					} 
-					IJ.log("distance = " + distance);
 				}
 		}
 			List<List<TrackPoint>> retTracklist = new ArrayList<List<TrackPoint>>(1000);
@@ -198,18 +202,23 @@ public class MultiTrackObjects extends Thread implements Measurements{
 				Roi wandRoi = new PolygonRoi(wand.xpoints, wand.ypoints, wand.npoints, Roi.POLYGON);
 				imp.setRoi(wandRoi);
 				
+				// Calculate circularity (from ij.plugin.filter.ParticleAnalyzer)
+				double perimeter = wandRoi.getLength();
+				double circularity = perimeter==0.0?0.0:4.0*Math.PI*(is.pixelCount/(perimeter*perimeter));
+				if (circularity>1.0) circularity = 1.0;
+				
 				if (methods == 0) { // Centroid tracking
-					is = imp.getStatistics(AREA + CENTROID + CIRCULARITY + MEAN);
+					is = imp.getStatistics(AREA + CENTROID + MEAN);
 					cx = is.xCentroid; cy = is.yCentroid;
 					mean = is.mean;
-					tp = new TrackPoint(cx, cy, is.area, mean, integint, is.CIRCULARITY, currentframe, roisize);
+					tp = new TrackPoint(cx, cy, is.area, mean, integint, circularity, currentframe, roisize);
 				} else if (methods == 1) { //CENTER OF MASS
-					is = imp.getStatistics(AREA + CENTER_OF_MASS + CIRCULARITY + MEAN);
+					is = imp.getStatistics(AREA + CENTER_OF_MASS + MEAN);
 					cx = is.xCenterOfMass; cy = is.yCenterOfMass;
 					mean = is.mean;
-					tp = new TrackPoint(cx, cy, is.area, mean, integint, is.CIRCULARITY, currentframe, roisize);
+					tp = new TrackPoint(cx, cy, is.area, mean, integint, circularity, currentframe, roisize);
 				} else if (methods == 2) { //2D Gaussian
-					is = imp.getStatistics(AREA + CENTROID + CIRCULARITY + MEAN);
+					is = imp.getStatistics(AREA + CENTROID + MEAN);
 					
 					// if roi is out of image bound
 					if(ixx < 0 || iyy < 0 ||(ixx + roisize) > imp.getWidth() || (iyy + roisize) > imp.getWidth())
@@ -259,10 +268,10 @@ public class MultiTrackObjects extends Thread implements Measurements{
 					}
 					if(!notfit) {
 						tp = new TrackPoint(cx, cy, sx, sy, is.area, mean, integint, offset, 
-								is.CIRCULARITY, currentframe, roisize, iteration);
+								circularity, currentframe, roisize, iteration);
 					} else {
 						tp = new TrackPoint(is.xCenterOfMass, is.yCenterOfMass, 0, 0, is.area, is.mean, integint, 0,
-								is.CIRCULARITY, currentframe, roisize, 1000);
+								circularity, currentframe, roisize, 1000);
 					}
 					
 				}

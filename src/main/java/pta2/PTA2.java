@@ -37,14 +37,14 @@ public class PTA2 extends PlugInFrame {
 	private static ImagePlus imp;
 	private static ImageCanvas ic;
 	private static Calibration cal;
-	private static MainWindow mw;
+	public static MainWindow mw;
 	public static List<List<TrackPoint>> tracklist;
 	public static int roisize = 12;
 	public static int searchrange = 12;
 	private static ResultDataTable rdt;
 	private static ChartFrame cframe;
 	public static boolean isTracking = false;
-	private ImageListener listener;
+	public static ImageListener listener;
 	public static int[] selectedlist;
 
 	public PTA2() {

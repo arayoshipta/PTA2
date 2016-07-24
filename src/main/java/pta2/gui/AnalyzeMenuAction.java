@@ -36,13 +36,27 @@ public class AnalyzeMenuAction extends AbstractAction implements Measurements {
 	private JTable jt;
 	private int[] selectedlist;
 	private int numlen;
+	private boolean batchmode = false;
+	private List<List<TrackPoint>> tracklist;
+	private String directoryloc = "";
+	
 
 	public AnalyzeMenuAction(ImagePlus imp, ResultDataTable rdt) {
 		this.imp = imp;
 		this.rdt = rdt;
+		this.tracklist = rdt.tracklist;
 		this.jt = rdt.jt;
 		this.cal = imp.getCalibration();	
 		this.numlen = 0;
+		this.batchmode = batchmode;
+	}
+	
+	public AnalyzeMenuAction(ImagePlus imp, List<List<TrackPoint>> tracklist, boolean batchmode, String directoryloc) {
+		this.imp = imp;
+		this.tracklist = tracklist;
+		this.numlen = tracklist.size();
+		this.batchmode = batchmode;
+		this.directoryloc  = directoryloc;
 	}
 	
 	/* (non-Javadoc)
@@ -52,17 +66,17 @@ public class AnalyzeMenuAction extends AbstractAction implements Measurements {
 	public void actionPerformed(ActionEvent e) {
 		AbstractButton b = (AbstractButton)e.getSource();
 
-		selectedlist = jt.getSelectedRows();
-
-		if (selectedlist.length == 0) {
-			numlen = rdt.tracklist.size();
-		} else {
-			numlen = selectedlist.length;
+		if(!batchmode) {
+			selectedlist = jt.getSelectedRows();
+	
+			if (selectedlist.length == 0) {
+				numlen = rdt.tracklist.size();
+			} else {
+				numlen = selectedlist.length;
+			}
+			for (int ind = 0; ind < numlen; ind++) 
+				selectedlist[ind] = jt.convertRowIndexToModel(selectedlist[ind]);
 		}
-		IJ.log("numlen = " + numlen);
-		
-		for (int ind = 0; ind < numlen; ind++) 
-			selectedlist[ind] = jt.convertRowIndexToModel(selectedlist[ind]);
 		
 		if(b.getText() == "Scatter Plot") 
 			scatterplot();
@@ -70,23 +84,31 @@ public class AnalyzeMenuAction extends AbstractAction implements Measurements {
 			showmultizint();
 	}
 
-	private void showmultizint() {
-		GenericDialog gd = new GenericDialog("Show multi-Z intensities");
-		gd.addMessage("Show intensities at fixed position");
-		gd.addCheckbox("is only use points in first frame?", false);
-		gd.enableYesNoCancel();
-		gd.showDialog();
-		if(gd.wasCanceled())
-			return;
-		boolean isff = gd.getNextBoolean();
+	public void showmultizint() {
+		boolean isff = false;
+		if(!batchmode) {
+			GenericDialog gd = new GenericDialog("Show multi-Z intensities");
+			gd.addMessage("Show intensities at fixed position");
+			gd.addCheckbox("is only use points in first frame?", false);
+			gd.enableYesNoCancel();
+			gd.showDialog();
+			if(gd.wasCanceled())
+				return;
+			isff = gd.getNextBoolean();
+		}
 		int tflen = imp.getNFrames();
 		int rsize = PTA2.roisize;
+		IJ.log("tracklist size = " + tracklist.size());
+		IJ.log("roisize = " + rsize);
 		ResultsTable rt = new ResultsTable();
 		for(int f = 1; f < tflen; f++) {
 			imp.setT(f);
 			rt.incrementCounter();
 			for(int rows = 0; rows < numlen; rows++) {
-				List<TrackPoint> templist = rdt.tracklist.get(selectedlist[rows]);
+				List<TrackPoint> templist = tracklist.get(rows);
+				if(!batchmode) {
+					templist = rdt.tracklist.get(selectedlist[rows]);
+				} 
 				TrackPoint fp = templist.get(0);
 				if (isff && fp.frame != 1)
 					continue;  // only use points in first frame
@@ -97,7 +119,13 @@ public class AnalyzeMenuAction extends AbstractAction implements Measurements {
 				rt.addValue("Track:" + rows, integint);
 			}
 		}
-		rt.show("Multi Track Data");
+		if(!batchmode)
+			rt.show("Multi Track Data");
+		else {
+			String fn = directoryloc + imp.getOriginalFileInfo().fileName + "fixedloc.csv";
+			IJ.log(fn);
+			rt.save(fn);
+		}
 	}
 
 	private synchronized void scatterplot() {

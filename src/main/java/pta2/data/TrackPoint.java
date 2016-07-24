@@ -74,13 +74,13 @@ public class TrackPoint {
 		double d = ed.compute(new double[]{fp.tx, fp.ty}, new double[]{sp.tx, sp.ty});
 		d = d / cal.pixelWidth;  // convert to pixel value
 
-		d += param[0] * (fp.mean - sp.mean) * (fp.mean - sp.mean);
-		d += param[1] * (fp.area - sp.area) * (fp.area - sp.area);
+		d += param[0] * Math.sqrt((fp.mean - sp.mean) * (fp.mean - sp.mean));
+		d += param[1] * Math.sqrt((fp.area - sp.area) * (fp.area - sp.area));
 		if(fp.preTp != null && param[2] == 1) {
 			d += (-1) * retCost(fp, sp);
 			IJ.log("d = " + d);
 		}
-		d += param[3] * (fp.circ - sp.circ) * (fp.circ - sp.circ);
+		d += param[3] * Math.sqrt((fp.circ - sp.circ) * (fp.circ - sp.circ));
 		return d;
 	}
 	

@@ -36,13 +36,23 @@ public class SaveDataAction extends AbstractAction {
 	
 	private ImagePlus imp;
 	private ResultDataTable rdt;
+	private boolean batchmode;
+	private String parentloc;
+	private List<List<TrackPoint>> tracklist;
 	static Color[] comboColors = {Color.cyan,Color.blue,Color.red,Color.yellow,Color.green,Color.magenta,Color.orange,Color.white};
 	static String[] cString = {"Cyan", "Blue", "Red", "Yellow", "Green", "Magenta", "Orange", "White"};
 
 	public SaveDataAction(ImagePlus imp, ResultDataTable rdt) {
 		this.imp = imp;
 		this.rdt = rdt;
-		
+		this.tracklist = rdt.tracklist;
+	}
+	
+	public SaveDataAction(ImagePlus imp, List<List<TrackPoint>> tracklist, boolean batchmode, String parentloc) {
+		this.imp = imp;
+		this.tracklist = tracklist;
+		this.batchmode = batchmode;
+		this.parentloc = parentloc;
 	}
 	
 	@Override
@@ -61,19 +71,40 @@ public class SaveDataAction extends AbstractAction {
 	}
 		
 	public void saveAll() {
-		SaveDialog sd = new SaveDialog("Save all",imp.getShortTitle()+"FIAllPoints",".txt");
-		File file = new File(sd.getDirectory(), sd.getFileName());
-		if(sd.getFileName() != null) {
+		String parent = "", fn = null;
+		if(!batchmode) {
+			SaveDialog sd = new SaveDialog("Save all",imp.getShortTitle()+"FIAllPoints",".txt");
+			parent = sd.getDirectory();
+			fn = sd.getFileName();
+		} else {
+			parent = parentloc;
+			fn = imp.getShortTitle()+"FIAllPoints.txt";
+			IJ.log(parent + fn);
+		}
+		
+		File file = new File(parent, fn);
+		try {
+			file.createNewFile();
+		} catch (IOException e) {
+			IJ.log(e.toString());
+		}
+		if(fn != null) {
 			try {
 				PrintWriter pw = new PrintWriter(new BufferedWriter(new FileWriter(file)));
 				List<TrackPoint> tmpPlist;
-				List<List<TrackPoint>> tracklist = rdt.tracklist;
-				JTable jt = rdt.jt;
-				
 				pw.println("Point Frame x y sx sy intensity integ.int offset area itteration velocity msd cost");
-				for(int index = 0; index < tracklist.size(); index++) {
-					tmpPlist = tracklist.get(jt.convertRowIndexToModel(index));
-					writePointData(tracklist, tmpPlist, pw);
+				if(!batchmode) {
+					JTable jt = rdt.jt;				
+					for(int index = 0; index < tracklist.size(); index++) {
+						tmpPlist = tracklist.get(jt.convertRowIndexToModel(index));
+						writePointData(tracklist, tmpPlist, pw);
+					}
+				} else {
+					// for batch mode
+					for(int index = 0; index < tracklist.size(); index++) {
+						tmpPlist = tracklist.get(index);
+						writePointData(tracklist, tmpPlist, pw);
+					}
 				}
 				pw.close();
 			} catch (IOException e1) {
@@ -88,7 +119,6 @@ public class SaveDataAction extends AbstractAction {
 			try {
 				PrintWriter pw = new PrintWriter(new BufferedWriter(new FileWriter(file)));
 				List<TrackPoint> tmpPlist;
-				List<List<TrackPoint>> tracklist = rdt.tracklist;
 				int[] selectedlist = rdt.selectedlist;
 
 				pw.println("Point Frame x y sx sy intensity integ.int offset area itteration velocity msd cost");
@@ -109,7 +139,6 @@ public class SaveDataAction extends AbstractAction {
 			try {
 				PrintWriter pw = new PrintWriter(new BufferedWriter(new FileWriter(file)));
 				List<TrackPoint> tmpPlist;
-				List<List<TrackPoint>> tracklist = rdt.tracklist;
 				JTable jt = rdt.jt;
 				
 				pw.println("Point Frame x y sx sy intensity integ.int offset area itteration velocity msd cost");

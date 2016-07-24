@@ -146,7 +146,9 @@ public class MainWindow extends JFrame {
 					yesnotrack.enableYesNoCancel();
 					yesnotrack.showDialog();
 					if(yesnotrack.wasOKed()) {
-						MultiTrackObjects mto = new MultiTrackObjects(imp, method, param, tol, roisize, searchrange, PTA2.tracklist);
+						MultiTrackObjects mto = new MultiTrackObjects(imp, method, param, 
+								(Double)tol.getValue(), (Integer)roisize.getValue(), (Integer)searchrange.getValue(),
+								PTA2.tracklist, false);
 						mto.start();
 					}
 				}
@@ -162,7 +164,7 @@ public class MainWindow extends JFrame {
 		LabelTol.setToolTipText("Noise Tolerance for find maxima");
 		TolerancePanel.add(LabelTol);
 
-		tol = new SpinnerNumberModel(15D, 0D, 100D, 0.1D); //
+		tol = new SpinnerNumberModel(40D, 0D, 100D, 0.1D); //
 		JSpinner Tol = new JSpinner(tol);
 		TolerancePanel.add(Tol);
 		
@@ -172,7 +174,6 @@ public class MainWindow extends JFrame {
 		DetectionPanel.setLayout(new GridLayout(4, 1, 0, 0));
 		
 		JRadioButton FindMaxima_RadioButton = new JRadioButton("Find Maxima");
-		FindMaxima_RadioButton.setSelected(true);
 		DetectionPanel.add(FindMaxima_RadioButton);
 		FindMaxima_RadioButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
@@ -183,6 +184,7 @@ public class MainWindow extends JFrame {
 		FindMaxima_RadioButton.setFont(new Font("Lucida Grande", Font.PLAIN, 13));
 		
 		JRadioButton Centroid_RadioButton = new JRadioButton("Centroid");
+		Centroid_RadioButton.setSelected(true);
 		DetectionPanel.add(Centroid_RadioButton);
 		Centroid_RadioButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
@@ -338,20 +340,18 @@ public class MainWindow extends JFrame {
 		TrackParamPanel.setLayout(new GridLayout(4, 1, 0, 0));
 		
 		chckbx_Intensity = new JCheckBox("Intensity");
-		chckbx_Intensity.setEnabled(false);
 		TrackParamPanel.add(chckbx_Intensity);
 		
 		chckbx_Size = new JCheckBox("Size");
-		chckbx_Size.setEnabled(false);
 		TrackParamPanel.add(chckbx_Size);
 		
 		chckbx_Angle = new JCheckBox("Angle");
-		chckbx_Angle.setEnabled(false);
 		TrackParamPanel.add(chckbx_Angle);
 		
 		chckbx_Circularity = new JCheckBox("Circularity");
-		chckbx_Circularity.setEnabled(false);
 		TrackParamPanel.add(chckbx_Circularity);
+		
+		addWindowListener(new myListener());
 	}
 
 	public int[] retParam() {
@@ -377,6 +377,29 @@ public class MainWindow extends JFrame {
 	
 	public boolean isNumTrack() {
 		return NumberCheckBox.isSelected();
+	}
+	
+	public class myListener extends WindowAdapter {
+		@Override
+		public void windowClosing(WindowEvent e) {
+			ResultDataTable rdt = PTA2.getRDT();
+			if (rdt != null) {
+				GenericDialog gd = new GenericDialog("Close");
+				gd.addMessage("Do you want to close PTA2?");
+				gd.enableYesNoCancel();
+				gd.showDialog();
+				if(gd.wasCanceled())
+					return;
+				rdt.dispose();
+			}
+		}
+		
+		@Override
+		public void windowClosed(WindowEvent e) {
+			ImagePlus.removeImageListener(PTA2.listener);
+			WindowManager.removeWindow(PTA2.mw);
+			imp.setOverlay(null);
+		}
 	}
 	
 }

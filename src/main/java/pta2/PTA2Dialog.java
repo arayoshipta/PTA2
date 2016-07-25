@@ -17,6 +17,10 @@ import pta2.gui.SaveDataAction;
 import pta2.track.MultiTrackObjects;
 
 /**
+ * PTA2Dialog is intended to call Image Macro for batch use.
+ * This can be called like
+ * run("PTA2Dialog", "methods=Centroid tol=40 roisize=12 search=3 intensity 
+ * size angle circularity filename=/Users/hoge/Documents/SampleMovie/ save");
  * @author araiyoshiyuki
  *
  */

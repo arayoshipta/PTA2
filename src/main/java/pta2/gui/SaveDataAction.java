@@ -25,6 +25,7 @@ import pta2.data.AnalyzeTrack;
 import pta2.data.TrackPoint;
 
 /**
+ * This class implements save menu for ResultDataTable
  * @author araiyoshiyuki
  *
  */

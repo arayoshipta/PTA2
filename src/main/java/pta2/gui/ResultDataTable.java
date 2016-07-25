@@ -32,6 +32,7 @@ import pta2.PTA2;
 import pta2.data.AnalyzeTrack;
 import pta2.data.TrackPoint;
 /**
+ * Create table 
  * @author araiyoshiyuki
  *
  */

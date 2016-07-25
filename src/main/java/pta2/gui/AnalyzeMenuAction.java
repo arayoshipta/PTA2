@@ -25,6 +25,7 @@ import pta2.PTA2;
 import pta2.data.TrackPoint;
 
 /**
+ * This class is used for ResultDataTable
  * @author araiY
  *
  */
@@ -85,6 +86,10 @@ public class AnalyzeMenuAction extends AbstractAction implements Measurements {
 	}
 
 	public void showmultizint() {
+		/*
+		 * Show multi Z-axis profiler
+		 * This method will also called from PTA2Dialog
+		 */
 		boolean isff = false;
 		if(!batchmode) {
 			GenericDialog gd = new GenericDialog("Show multi-Z intensities");
@@ -129,6 +134,9 @@ public class AnalyzeMenuAction extends AbstractAction implements Measurements {
 	}
 
 	private synchronized void scatterplot() {
+		/*
+		 * Make Scatter plot
+		 */
 		GenericDialog gdsplot = new GenericDialog("Scatter plot");
 		gdsplot.addMessage("Scatter plot");
 		gdsplot.addNumericField("Scale", 1.0, 2);

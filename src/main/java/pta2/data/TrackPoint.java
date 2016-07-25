@@ -5,6 +5,11 @@ import org.apache.commons.math3.ml.distance.EuclideanDistance;
 import ij.IJ;
 import ij.measure.Calibration;
 
+/*
+ * Class for each detected trackpoint
+ * @author araiyoshiyuki
+ */
+
 public class TrackPoint {
 
 	public double tx, ty;
@@ -15,7 +20,7 @@ public class TrackPoint {
 	public double integint;
 	public double area;
 	public double sx = 0, sy = 0; // sigma x, sigma y
-	public int ite = 0; // number of itteration
+	public int ite = 0; // number of iteration
 	public double circ;
 	public int roisize;
 	public double offset = 0;
@@ -66,9 +71,11 @@ public class TrackPoint {
 	
 	public static double calcDistance(TrackPoint fp, TrackPoint sp, int[] param, Calibration cal) {
 		/*
-		 * fp: first point
-		 * sp: second point
-		 * param: parameter for calc distance
+		 * Calculate and ret the euclideanDistance 
+		 * @param fp, first point
+		 * @param sp, second point
+		 * @param param, parameter for calc distance
+		 * @param cal, Calibration object
 		 */
 		EuclideanDistance ed = new EuclideanDistance();  // calculate euclideanDistance
 		double d = ed.compute(new double[]{fp.tx, fp.ty}, new double[]{sp.tx, sp.ty});
@@ -78,13 +85,17 @@ public class TrackPoint {
 		d += param[1] * Math.sqrt((fp.area - sp.area) * (fp.area - sp.area));
 		if(fp.preTp != null && param[2] == 1) {
 			d += (-1) * retCost(fp, sp);
-			IJ.log("d = " + d);
 		}
 		d += param[3] * Math.sqrt((fp.circ - sp.circ) * (fp.circ - sp.circ));
 		return d;
 	}
 	
 	public static double retCost(TrackPoint ap, TrackPoint bp) {
+		/*
+		 * Calculate cos-theta by the inner product,
+		 * @param ap, first trackpoint
+		 * @param bp, second trackpoint
+		 */
 		double lenlen = Math.sqrt((ap.tx - bp.tx) * (ap.tx - bp.tx) + (ap.ty - bp.ty) * (ap.ty - bp.ty)) *
 				Math.sqrt((ap.preTp.tx - ap.tx) * (ap.preTp.tx - ap.tx) + (ap.preTp.ty - ap.ty) * (ap.preTp.ty - ap.ty));
 		return ((ap.tx - ap.preTp.tx) * (bp.tx - ap.tx) + (ap.ty - ap.preTp.ty) * (bp.ty - ap.ty)) / lenlen;

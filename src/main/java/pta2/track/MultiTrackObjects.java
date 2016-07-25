@@ -30,6 +30,7 @@ import pta2.gui.DrawRois;
 import pta2.gui.ResultDataTable;
 
 /**
+ * Perfomr multiplt tracking
  * @author araiyoshiyuki
  *
  */

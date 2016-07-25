@@ -7,6 +7,10 @@ import ij.gui.Overlay;
 import ij.gui.Roi;
 import ij.measure.Calibration;
 
+/*
+ * Draw square rois obtained by Find Maxima
+ * @author araiyoshiyuki
+ */
 public class DrawRois {
 
 		Overlay ol;

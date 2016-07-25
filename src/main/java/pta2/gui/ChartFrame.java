@@ -26,6 +26,7 @@ import java.util.Arrays;
 import java.util.List;
 
 /**
+ * Create multi-plot graph
  * @author araiyoshiyuki
  *
  */

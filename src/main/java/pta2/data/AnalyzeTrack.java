@@ -10,9 +10,9 @@ import ij.ImagePlus;
 import ij.measure.Calibration;
 
 /**
+ * This class used to make a summry of tracklist
  * @author araiyoshiyuki
  * 
- * 	final static String[] columnNames = {"#", "From", "To", "FrameLength", "Ave. Intensity", "Ave. Velocity", "RunLength", "Check", "Color"};
  */
 public class AnalyzeTrack {
 

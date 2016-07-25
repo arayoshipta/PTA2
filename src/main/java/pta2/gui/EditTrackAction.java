@@ -18,6 +18,7 @@ import pta2.PTA2;
 import pta2.data.TrackPoint;
 
 /**
+ * This class implements edit menu for ResultDataTable
  * @author araiyoshiyuki
  *
  */

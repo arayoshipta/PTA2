@@ -12,7 +12,6 @@ import ij.process.*;
 import pta2.PTA2;
 import pta2.data.TrackPoint;
 import pta2.track.MultiTrackObjects;
-import pta2.track.SingleTrackObject;
 
 import java.awt.GridBagLayout;
 import java.awt.GridLayout;
@@ -47,6 +46,7 @@ import java.awt.Rectangle;
 import javax.swing.BoxLayout;
 
 /**
+ * Create Main window frame
  * @author araiyoshiyuki
  *
  */
@@ -69,9 +69,7 @@ public class MainWindow extends JFrame {
 	private JCheckBox AllCheckBox;
 	private JCheckBox ROICheckBox;
 	private JCheckBox NumberCheckBox;
-	
-	SingleTrackObject to;
-	
+		
 	public MainWindow() {
 		setBounds(new Rectangle(500, 220, 550, 250));
 		setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);

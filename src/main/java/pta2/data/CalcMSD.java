@@ -5,7 +5,10 @@ import ij.measure.Calibration;
 import java.util.ArrayList;
 import java.util.List;
 
-
+/* 
+ * This class calculate mean square displacement of track
+ * @author araiyoshiyuki
+ */
 public class CalcMSD {
 
 	private ArrayList<Double> msdList;

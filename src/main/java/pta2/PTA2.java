@@ -10,7 +10,6 @@ import pta2.gui.*;
 
 import java.awt.Font;
 import java.awt.Frame;
-import java.awt.event.WindowEvent;
 import java.awt.geom.GeneralPath;
 import java.util.ArrayList;
 import java.util.List;
@@ -24,8 +23,9 @@ import ij.gui.TextRoi;
 import ij.measure.Calibration;
 
 /**
+ * PTA2 is a main class of this plugins.
+ * 
  * @author araiyoshiyuki
- *
  */
 public class PTA2 extends PlugInFrame {
 
@@ -78,7 +78,6 @@ public class PTA2 extends PlugInFrame {
 			//ip.setThreshold(-808080.0D, ip.getMax(), ImageProcessor.RED_LUT);
 			ic = imp.getCanvas();
 			cal = imp.getCalibration();
-			ic.addMouseListener(new icMouseAdapter(imp, roisize, mw));
 			WindowManager.addWindow(mw);
 			ImagePlus.addImageListener(listener = new ImageListener() {
 
@@ -172,18 +171,28 @@ public class PTA2 extends PlugInFrame {
 			frame = null;
 		}
 	}
-	
+
 	public static void setTrackList(List<List<TrackPoint>> tlist) {
+		/*
+		 * set to tracked list
+		 * @param tracklist, tracklist
+		 */
 		tracklist = tlist;
 	}
 	
 	public static List<List<TrackPoint>> getTrackList() {
+		/*
+		 * return current tracklist
+		 * @return tracklist, current tracklist
+		 */
 		return tracklist;
 	}
 	
 	public static void updateRDT(ImagePlus simp, ResultDataTable srdt) {
 		/*
 		 * update Result Data Table
+		 * @param simp, set new ImagePlus
+		 * @param srdt, set new ResultDataTable
 		 */
 		imp = simp;
 		ic = imp.getCanvas();
@@ -191,25 +200,34 @@ public class PTA2 extends PlugInFrame {
 	}
 	
 	public static void setlist(List<List<TrackPoint>> tlist, int[] slist) {
+		/*
+		 * update selected list of ResultTableData
+		 * @param tracklist, tracklist
+		 * @param slist, indices of selected rows
+		 */
 		tracklist = tlist;
 		selectedlist = slist;
 	}
 
 	public static ResultDataTable getRDT() {
-		// TODO Auto-generated method stub
+		/*
+		 * @return return current ResultDataTable
+		 */
 		return rdt;
 	}
 	
 	public static ChartFrame getcframe() {
+		/*
+		 * @return, current ChartFrame object
+		 */
 		return cframe;
 	}
 	
 	public static void setcframe(ChartFrame cf) {
+		/*
+		 * @param cf, set new ChartFrame object
+		 */
 		cframe = cf;
 	}
 	
-	@Override
-	public void windowClosed(WindowEvent e) {
-		IJ.log("Window closed");
-	}
 }

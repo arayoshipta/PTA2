@@ -1,6 +1,6 @@
 #PTA2
 ## About
-PTA2 is a ImageJ plugins that enable automatic particle tracking. This is a new version of [PTA](https://github.com/arayoshipta/projectPTAj). New features are as follows:
+PTA2 is a ImageJ1.x plugins that enable automatic particle tracking. This is a new version of [PTA](https://github.com/arayoshipta/projectPTAj). New features are as follows:
 1. Point detection can be performed by "Find Maxima"
 2. Four different methods for localization, "Find Maxima", "Centroid", "Center of Mass", and "2D Gaussian".
 3. No need to use JNI (Java Native Library)
@@ -69,6 +69,9 @@ By this macro, all tracked data
 
 **filename** indicates where you want to save.
 **save** enables save multi-Z intensities at fixed locations
+
+#### History
+2016.07.25 version 0.5 uploaded to GitHub
 
 #### Author information
 Yoshiyuki Arai

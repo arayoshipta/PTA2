@@ -40,7 +40,7 @@ public class PTA2Dialog implements PlugInFilter {
 		gd.addNumericField("Tol", 40, 1);
 		gd.addNumericField("roisize", 12, 1);
 		gd.addNumericField("Search range", 3, 1);
-		gd.addCheckbox("Inensity", false);
+		gd.addCheckbox("Intensity", false);
 		gd.addCheckbox("Size", false);
 		gd.addCheckbox("Angle", false);
 		gd.addCheckbox("Circularity", false);

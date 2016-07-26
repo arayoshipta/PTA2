@@ -59,7 +59,7 @@ If you are beginner, I recommend you to use [Fiji](https://fiji.sc/) since it eq
 2. **Show multi-Z intensities** enable the obtaining intensity trajectory at first frame of ROI. The data are exported as Result table
 	- This function can be used to analyze on/off or blinking event of particles.
 
-#### Use with macro
+### Use with macro
 Because PTA2 has **PTA2Dialog** you can call this from ImageJ macro like this;
 
 ```

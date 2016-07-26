@@ -12,7 +12,7 @@ This plugin is free to use, but the copyright is not abandoned. **I HAVE NO RESP
 
 
 ##Install
-If you are beginner, I recommend you to use [Fiji](https://fiji.sc/) since it equipps all required libraries for PTA2.
+If you are beginner, I recommend you to use [Fiji](https://fiji.sc/) since it equips all required libraries for PTA2.
 ### Fiji
  1. Put "PTA2_-0.5.0-SNAPSHOT.jar" into Fiji's plugins folder
  2. Start Fiji, then you'll find "PTA2" in plugins menu bar
@@ -28,7 +28,7 @@ If you are beginner, I recommend you to use [Fiji](https://fiji.sc/) since it eq
 ## Usage
 ### Multiple tracking
 1. Prepare stack image.
-2. Launch **TA2** from plugin menu.
+2. Launch **PTA2** from plugin menu.
 3. Adjust threshold. *This process is required if you want to store **Size** information.*
 4. Adjust **Tol.**. This parameter is completely same mean as "Tolerance" in "Find Maxima" method.
 5. If you check **Tracking parameters** in Main Window (***Intensity, Size, Angle, Circularity***), at the linkage steps, these parameters are also included to calculate the distance.
@@ -51,7 +51,7 @@ If you are beginner, I recommend you to use [Fiji](https://fiji.sc/) since it eq
 1. You can **delete**, **split**, and **concatenate** tracks.
 2. **Split** can be performed at the current frame
 3. To concatenate tracks, choose two tracks that don't overlap about time.
-4. If there is a gap between last frame of first track and first frame of second track, simple interoperation will be performed.
+4. If there is a gap between last frame of first track and first frame of second track, simple interpolation will be performed.
 
 #### Analyze menu
 1. **Scatter plot** enable simple plotting the localization of points. You can change the scale. Instead of using mean intensity, you can use "1" value.
@@ -75,4 +75,5 @@ By this macro, all tracked data
 
 #### Author information
 Yoshiyuki Arai
+
 E-mail: projectptaj@gmail.com

@@ -47,11 +47,13 @@ public class MultiTrackObjects extends Thread implements Measurements{
 		private Double tol;
 		private int[] param;
 		private boolean batchmode;
+		private int startframe;
 		private static ResultDataTable rdt;
 
-		public MultiTrackObjects(ImagePlus imp, int methods, int param[], double tol, int roisize,
+		public MultiTrackObjects(ImagePlus imp, int startframe, int methods, int param[], double tol, int roisize,
 				int searchrange, List<List<TrackPoint>> tracklist, boolean batchmode) {
 			this.imp = imp;
+			this.startframe = startframe;
 			this.methods = methods;
 			this.param = param;
 			this.roisize = roisize;
@@ -69,7 +71,6 @@ public class MultiTrackObjects extends Thread implements Measurements{
 		
 		public void run() {
 			int totalframe = imp.getNFrames();
-			int startframe = imp.getFrame();
 			int f = startframe;
 			
 			allp = new ArrayList<List<TrackPoint>>(totalframe - startframe);

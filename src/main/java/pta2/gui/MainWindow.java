@@ -137,6 +137,16 @@ public class MainWindow extends JFrame {
 						imp.setDimensions(1, 1, imp.getStackSize());
 					}
 				}
+				int startframe = 1;
+				// whether mutli-track starts from the first frame or not
+				if(imp.getFrame() != 1) {
+					GenericDialog gd = new GenericDialog("Start frame");
+					gd.addMessage("Do you want to start multitrack from curret frame?");
+					gd.enableYesNoCancel("Current", "First");
+					gd.showDialog();
+					if(gd.wasOKed())
+						startframe = imp.getFrame();
+				}
 				
 				if (roitype == Roi.RECTANGLE && (imp.getSlice() != imp.getStackSize())) { // i.e Roi is wand
 					GenericDialog yesnotrack = new GenericDialog("Track?");
@@ -144,7 +154,7 @@ public class MainWindow extends JFrame {
 					yesnotrack.enableYesNoCancel();
 					yesnotrack.showDialog();
 					if(yesnotrack.wasOKed()) {
-						MultiTrackObjects mto = new MultiTrackObjects(imp, method, param, 
+						MultiTrackObjects mto = new MultiTrackObjects(imp, startframe, method, param, 
 								(Double)tol.getValue(), (Integer)roisize.getValue(), (Integer)searchrange.getValue(),
 								PTA2.tracklist, false);
 						mto.start();

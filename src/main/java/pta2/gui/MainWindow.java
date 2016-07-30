@@ -407,6 +407,7 @@ public class MainWindow extends JFrame {
 			ImagePlus.removeImageListener(PTA2.listener);
 			WindowManager.removeWindow(PTA2.mw);
 			imp.setOverlay(null);
+			PTA2.frame = null;
 		}
 	}
 	

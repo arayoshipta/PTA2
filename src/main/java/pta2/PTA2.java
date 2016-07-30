@@ -33,7 +33,7 @@ public class PTA2 extends PlugInFrame {
 	 * 
 	 */
 	private static final long serialVersionUID = 1L;
-	private static Frame frame = null;
+	public static Frame frame = null;
 	private static ImagePlus imp;
 	private static ImageCanvas ic;
 	private static Calibration cal;
@@ -53,7 +53,7 @@ public class PTA2 extends PlugInFrame {
 		if (IJ.versionLessThan("1.43g"))
 			return;
 		if (frame != null){
-			IJ.error("SimplePTA is already implemented");
+			IJ.error("PTA2 is already implemented");
 			return;
 		}
 		frame = this;

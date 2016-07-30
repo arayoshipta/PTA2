@@ -172,7 +172,7 @@ public class MainWindow extends JFrame {
 		LabelTol.setToolTipText("Noise Tolerance for find maxima");
 		TolerancePanel.add(LabelTol);
 
-		tol = new SpinnerNumberModel(40D, 0D, 100D, 0.1D); //
+		tol = new SpinnerNumberModel(40D, 0D, null, 0.1D); //
 		JSpinner Tol = new JSpinner(tol);
 		TolerancePanel.add(Tol);
 		

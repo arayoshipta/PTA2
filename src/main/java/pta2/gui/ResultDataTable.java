@@ -184,7 +184,6 @@ public class ResultDataTable extends JFrame {
 		public void valueChanged(ListSelectionEvent e) {
 			if(e.getValueIsAdjusting()) return; // to avoid overlapping procedure
 			int index = jt.convertRowIndexToModel(jt.getSelectedRow());
-			IJ.log("index = " + index);
 			selectedlist = jt.getSelectedRows();
 			for (int ind = 0; ind < selectedlist.length; ind++) 
 				selectedlist[ind] = jt.convertRowIndexToModel(selectedlist[ind]);
@@ -202,7 +201,6 @@ public class ResultDataTable extends JFrame {
 			cframe.setVisible(true);
 			imp.setT(tracklist.get(index).get(0).frame); // set imp to first track frame
 		}
-		
 	}
 	
 	public Color getDataofColor(int index) {

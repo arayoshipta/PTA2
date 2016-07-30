@@ -44,7 +44,7 @@ If you are beginner, I recommend you to use [Fiji](https://fiji.sc/) since it eq
 4. Table has several menus, Save, Edit, Analyze
 
 #### Save menu
-1. You can save you data as text data from save menu.
+1. You can save your data as text data from save menu.
 	 - I encourage you to analyze data by Pandas in python. 
 
 #### Edit menu

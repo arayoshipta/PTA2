@@ -22,6 +22,7 @@ import ij.measure.ResultsTable;
 import ij.process.ImageProcessor;
 import ij.process.ImageStatistics;
 import pta2.PTA2;
+import pta2.data.AnalyzeTrack;
 import pta2.data.TrackPoint;
 import pta2.track.MultiTrackObjects;
 
@@ -101,11 +102,15 @@ public class AnalyzeMenuAction extends AbstractAction implements Measurements {
 		for(int rows = 0; rows < numlen; rows++) {
 			List<TrackPoint> tmplist = rdt.tracklist.get(selectedlist[rows]);
 			for(TrackPoint tp: tmplist) {
-				IJ.log("Pre:" + tp.toString());
 				tp = MultiTrackObjects.twoDGFit(imp, tp);
-				IJ.log("Post:" + tp.toString());
 			}
+			AnalyzeTrack at = new AnalyzeTrack(imp, tmplist);
+			jt.setValueAt((Double)at.aveInt, rows, 4);  // average intensity
+			jt.setValueAt((Double)at.aveVel, rows, 5);  // average velocity
+			jt.setValueAt((Double)at.runLen, rows, 6);  // runlength
 		}
+		ChartFrame cf = PTA2.getcframe();
+		cf.drawTrajectory(rdt.tracklist.get(selectedlist[0]));
 		imp.deleteRoi();
 	}
 	
@@ -127,8 +132,6 @@ public class AnalyzeMenuAction extends AbstractAction implements Measurements {
 		}
 		int tflen = imp.getNFrames();
 		int rsize = PTA2.roisize;
-		IJ.log("tracklist size = " + tracklist.size());
-		IJ.log("roisize = " + rsize);
 		ResultsTable rt = new ResultsTable();
 		for(int f = 1; f < tflen; f++) {
 			imp.setT(f);

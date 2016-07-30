@@ -13,7 +13,7 @@
 	</parent>
 
 	<groupId>yo4.ara</groupId>
-	<version>0.6.0-SNAPSHOT</version>
+	<version>0.6.3-SNAPSHOT</version>
 
 	<name>plugins/PTA2_.jar</name>
 	<description>A Maven project implementing an ImageJ 1.x plugin that simply track the particle/object</description>

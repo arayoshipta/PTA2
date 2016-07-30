@@ -23,6 +23,7 @@ import ij.process.ImageProcessor;
 import ij.process.ImageStatistics;
 import pta2.PTA2;
 import pta2.data.TrackPoint;
+import pta2.track.MultiTrackObjects;
 
 /**
  * This class is used for ResultDataTable
@@ -83,8 +84,31 @@ public class AnalyzeMenuAction extends AbstractAction implements Measurements {
 			scatterplot();
 		if(b.getText() == "Show multi-Z intensities") 
 			showmultizint();
+		if(b.getText() == "Fitting by 2DGaussian")
+			fitbytd();
 	}
 
+	public synchronized void fitbytd() {
+		/*
+		 * Fitting current track by two dimensional Gaussian
+		 */
+		GenericDialog gd = new GenericDialog("Fitting by 2D Gaussian");
+		gd.addMessage("Do you want to perform 2D Gaussian Fitting?");
+		gd.enableYesNoCancel();
+		gd.showDialog();
+		if(gd.wasCanceled())
+			return;
+		for(int rows = 0; rows < numlen; rows++) {
+			List<TrackPoint> tmplist = rdt.tracklist.get(selectedlist[rows]);
+			for(TrackPoint tp: tmplist) {
+				IJ.log("Pre:" + tp.toString());
+				tp = MultiTrackObjects.twoDGFit(imp, tp);
+				IJ.log("Post:" + tp.toString());
+			}
+		}
+		imp.deleteRoi();
+	}
+	
 	public void showmultizint() {
 		/*
 		 * Show multi Z-axis profiler

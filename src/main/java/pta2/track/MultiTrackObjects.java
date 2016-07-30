@@ -7,15 +7,11 @@ import java.awt.Polygon;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.swing.SpinnerNumberModel;
-
 import org.apache.commons.math3.fitting.leastsquares.LeastSquaresOptimizer.Optimum;
 
 import ij.IJ;
-import ij.ImageJ;
 import ij.ImagePlus;
 import ij.gui.PolygonRoi;
-import ij.gui.ProgressBar;
 import ij.gui.Roi;
 import ij.gui.Wand;
 import ij.measure.Calibration;
@@ -163,10 +159,7 @@ public class MultiTrackObjects extends Thread implements Measurements{
 			int currentframe = imp.getFrame();
 			double mean = 0;
 			double integint = 0;
-			double offset = 0;
 			double cx = 0, cy = 0; // center of x,y
-			double sx = 0, sy = 0; // sigma x,y
-			int iteration = 0;
 			List<TrackPoint> tmpl = new ArrayList<TrackPoint>(100);
 			int p = 0; // num of points
 			do {
@@ -178,14 +171,8 @@ public class MultiTrackObjects extends Thread implements Measurements{
 					p++;
 					continue; // skip points
 				}
-				// calculate integrated intensity in ROI
-				ImageStatistics is = imp.getStatistics(CENTROID + RECT);
-				double xx = is.xCentroid - cal.pixelWidth * (double)roisize / 2.0D;
-				double yy = is.yCentroid - cal.pixelHeight * (double)roisize / 2.0D;
-				int ixx = (int)(xx / cal.pixelWidth);
-				int iyy = (int)(yy / cal.pixelHeight);				
-
 				
+				ImageStatistics is = imp.getStatistics(CENTROID + RECT);				
 				Roi sqroi = new Roi((int)(x * cal.pixelWidth - roisize / 2), (int)(y * cal.pixelHeight - roisize / 2), 
 						roisize, roisize);
 				imp.setRoi(sqroi);
@@ -209,77 +196,86 @@ public class MultiTrackObjects extends Thread implements Measurements{
 				double circularity = perimeter==0.0?0.0:4.0*Math.PI*(is.pixelCount/(perimeter*perimeter));
 				if (circularity>1.0) circularity = 1.0;
 				
-				if (methods == 0) { // Centroid tracking
-					is = imp.getStatistics(AREA + CENTROID + MEAN);
-					cx = is.xCentroid; cy = is.yCentroid;
-					mean = is.mean;
-					tp = new TrackPoint(cx, cy, is.area, mean, integint, circularity, currentframe, roisize);
-				} else if (methods == 1) { //CENTER OF MASS
+				// Centroid tracking
+				is = imp.getStatistics(AREA + CENTROID + MEAN);
+				cx = is.xCentroid; cy = is.yCentroid;
+				mean = is.mean;
+				tp = new TrackPoint(cx, cy, is.area, mean, integint, circularity, currentframe, roisize);
+				if (methods == 1) { //CENTER OF MASS
 					is = imp.getStatistics(AREA + CENTER_OF_MASS + MEAN);
 					cx = is.xCenterOfMass; cy = is.yCenterOfMass;
 					mean = is.mean;
 					tp = new TrackPoint(cx, cy, is.area, mean, integint, circularity, currentframe, roisize);
-				} else if (methods == 2) { //2D Gaussian
-					is = imp.getStatistics(AREA + CENTROID + MEAN);
-					
-					// if roi is out of image bound
-					if(ixx < 0 || iyy < 0 ||(ixx + roisize) > imp.getWidth() || (iyy + roisize) > imp.getWidth())
-					{
-						p++;
-						continue;
-					}
-					FloatProcessor fip = ip.convertToFloatProcessor();
-					double[] inputdata = new double[roisize * roisize];
-					float[] pixVal = (float[])fip.getPixels();
-					for(int ii = 0;ii < roisize * roisize; ii++) {
-						// x position is mod (count (ii), y number )
-						// y position is count / x size number
-						int ix = ii % roisize, iy = ii / roisize;
-						double tmpval = (double)pixVal[ixx + ix + (iyy + iy) * imp.getWidth()];
-						inputdata[ix + iy * roisize] = tmpval;
-						integint += tmpval;
-					}				
-					double[] newStart = {  // initial values for 2D Gaussian fitting
-							(double)is.max,			// intensity
-							(double)roisize / 2D,	// x
-							(double)roisize / 2D,	// y
-							(double)roisize / 10D,	// sigma x
-							(double)roisize / 10D,	// sigma y
-							(double)is.min			// offset		
-					};
-					TwoDGaussProblem tdgp = new TwoDGaussProblem(inputdata, newStart, roisize, new int[] {1000, 1000});
-					boolean notfit = false;
-					
-					try{
-						//do LevenbergMarquardt optimization and get optimized parameters
-						Optimum opt = tdgp.fit2dGauss();
-						final double[] optimalValues = opt.getPoint().toArray();
-					
-						cx = (double)ixx + optimalValues[1];
-						cy = (double)iyy + optimalValues[2];
-						mean = optimalValues[0];
-						offset = optimalValues[5];
-						sx = optimalValues[3];
-						sy = optimalValues[4];
-						iteration = opt.getIterations();
-						//IJ.log("Iteration = "+iteration);
-					} catch (Exception e) {
-						//IJ.log("cx="+cx+", cy="+cy+", mean="+mean+", offset="+offset+", sx="+sx+", sy="+sy);
-						//IJ.log(e.toString());
-						notfit = true;
-					}
-					if(!notfit) {
-						tp = new TrackPoint(cx, cy, sx, sy, is.area, mean, integint, offset, 
-								circularity, currentframe, roisize, iteration);
-					} else {
-						tp = new TrackPoint(is.xCenterOfMass, is.yCenterOfMass, 0, 0, is.area, is.mean, integint, 0,
-								circularity, currentframe, roisize, 1000);
-					}
-					
+				} else if (methods == 2) { //2D Gaussian fitting
+					tp = twoDGFit(imp, tp);
 				}
 				tmpl.add(tp);
 				p++;
 			}while(p < mp.npoints);
 			return tmpl;
+		}
+		
+		public static TrackPoint twoDGFit(ImagePlus imps, TrackPoint tp) {
+			/*
+			 * @param imps ImagePlus
+			 * @param tp, initial trackpoint
+			 * @ret two dimensional Gaussian fitted TrackPoint
+			 */
+			int frame = tp.frame;
+			int roisize = tp.roisize;
+			imps.setT(frame);
+			ImageProcessor ip = imps.getProcessor();
+			Calibration cal = imps.getCalibration();			
+			Roi sqroi = new Roi((int)(tp.tx * cal.pixelWidth - roisize / 2), (int)(tp.ty * cal.pixelHeight - roisize / 2), 
+					roisize, roisize);
+			imps.setRoi(sqroi);
+			ImageStatistics is = imps.getStatistics(CENTROID + RECT);
+			double xx = is.xCentroid - cal.pixelWidth * (double)roisize / 2.0D;
+			double yy = is.yCentroid - cal.pixelHeight * (double)roisize / 2.0D;
+			int ixx = (int)(xx / cal.pixelWidth);
+			int iyy = (int)(yy / cal.pixelHeight);	
+			
+			// if roi is out of image bound
+			if(ixx < 0 || iyy < 0 ||(ixx + roisize) > imps.getWidth() || (iyy + roisize) > imps.getWidth())
+			{
+				return tp; // cannot fit
+			}
+			FloatProcessor fip = ip.convertToFloatProcessor();
+			double[] inputdata = new double[roisize * roisize];
+			float[] pixVal = (float[])fip.getPixels();
+			for(int ii = 0;ii < roisize * roisize; ii++) {
+				// x position is mod (count (ii), y number )
+				// y position is count / x size number
+				int ix = ii % roisize, iy = ii / roisize;
+				double tmpval = (double)pixVal[ixx + ix + (iyy + iy) * imps.getWidth()];
+				inputdata[ix + iy * roisize] = tmpval;
+			}				
+			double[] newStart = {  // initial values for 2D Gaussian fitting
+					(double)is.max,			// intensity
+					(double)roisize / 2D,	// x
+					(double)roisize / 2D,	// y
+					(double)roisize / 10D,	// sigma x
+					(double)roisize / 10D,	// sigma y
+					(double)is.min			// offset		
+			};
+			TwoDGaussProblem tdgp = new TwoDGaussProblem(inputdata, newStart, roisize, new int[] {1000, 1000});
+			
+			try{
+				//do LevenbergMarquardt optimization and get optimized parameters
+				Optimum opt = tdgp.fit2dGauss();
+				final double[] optimalValues = opt.getPoint().toArray();
+			
+				tp.tx = (double)ixx + optimalValues[1];
+				tp.ty = (double)iyy + optimalValues[2];
+				tp.mean = optimalValues[0];
+				tp.offset = optimalValues[5];
+				tp.sx = optimalValues[3];
+				tp.sy = optimalValues[4];
+				tp.ite = opt.getIterations();
+				//IJ.log("Iteration = "+iteration);
+			} catch (Exception e) {
+				//nothing to do
+			}
+			return tp;
 		}
 } 

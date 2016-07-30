@@ -161,9 +161,12 @@ public class ResultDataTable extends JFrame {
 			concatenateTrack.addActionListener(new EditTrackAction(imp, rdt));
 			edit.add(concatenateTrack);
 			
-			// Plot menu
+			// Analyze menu
 			JMenu analyze = new JMenu("Analyze");
 			menubar.add(analyze);
+			JMenuItem fittdg = new JMenuItem("Fitting by 2DGaussian");
+			fittdg.addActionListener(new AnalyzeMenuAction(imp, rdt));
+			analyze.add(fittdg);
 			JMenuItem scatterplot = new JMenuItem("Scatter Plot");
 			scatterplot.addActionListener(new AnalyzeMenuAction(imp, rdt));
 			analyze.add(scatterplot);

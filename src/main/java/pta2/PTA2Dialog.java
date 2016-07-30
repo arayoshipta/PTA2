@@ -36,11 +36,12 @@ public class PTA2Dialog implements PlugInFilter {
 		for(String s: methods)
 			met.add(s);
 		if(imp.getStackSize() != imp.getNFrames())
-			imp.setDimensions(1, 1, imp.getStackSize());
+			imp.setDimensions(1, 1, imp.getStackSize()); // change slice to frame
 		IJ.log("directory is = " + imp.getOriginalFileInfo().directory);
 		GenericDialog gd = new GenericDialog("PTA2 Dialog");
 		gd.addMessage("Parameters");
 		gd.addChoice("Methods", methods, "Centroid");
+		gd.addCheckbox("from first frame?", true);
 		gd.addNumericField("Tol", 40, 1);
 		gd.addNumericField("roisize", 12, 1);
 		gd.addNumericField("Search range", 3, 1);
@@ -55,6 +56,7 @@ public class PTA2Dialog implements PlugInFilter {
 			return;
 		
 		String m = gd.getNextChoice();
+		boolean isff = gd.getNextBoolean();
 		double tol = gd.getNextNumber();
 		int roisize = (int)gd.getNextNumber();
 		int searchrange = (int)gd.getNextNumber();
@@ -66,7 +68,8 @@ public class PTA2Dialog implements PlugInFilter {
 		PTA2.roisize = roisize;
 		//MultiTrackObjects(ImagePlus imp, int methods, int param[], double tol, int roisize,
 		//SpinnerNumberModel searchrange, List<List<TrackPoint>> tracklist, boolean batchmode)
-		MultiTrackObjects mto = new MultiTrackObjects(imp, metnum, param, tol, roisize, searchrange, tracklist, true);
+		int startframe = isff?1:imp.getFrame();
+		MultiTrackObjects mto = new MultiTrackObjects(imp, startframe, metnum, param, tol, roisize, searchrange, tracklist, true);
 		mto.start();
 		try {
 			mto.join();

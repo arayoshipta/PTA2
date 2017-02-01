@@ -15,7 +15,7 @@ This plugin is free to use, but the copyright is not abandoned. **I HAVE NO RESP
 ##Install
 If you are beginner, I recommend you to use [Fiji](https://fiji.sc/) since it equips all required libraries for PTA2.
 ### Fiji
- 1. Put "PTA2_-0.5.0-SNAPSHOT.jar" into Fiji's plugins folder
+ 1. Put "PTA2_-0.6.5-SNAPSHOT.jar" into Fiji's plugins folder
  2. Start Fiji, then you'll find "PTA2" in plugins menu bar
 
 ### ImageJ
@@ -72,7 +72,9 @@ By this macro, all tracked data
 **save** enables save multi-Z intensities at fixed locations
 
 #### History
-2016.07.25 version 0.5 uploaded to GitHub
+- 2016.07.25 version 0.5 uploaded to GitHub
+- 2017.02.01 version 0.6.5
+	- fixed the problem of velocity and area calculation
 
 #### Author information
 Yoshiyuki Arai

@@ -141,8 +141,8 @@ public class PTA2 extends PlugInFrame {
 								if(mw.isNumTrack()) {
 									Roi numroi;
 									int rs = tp.roisize;
-									numroi = new TextRoi((int)tp.tx / cal.pixelWidth + rs / 2 + 2, 
-											(int)tp.ty / cal.pixelHeight - rs / 2, 
+									numroi = new TextRoi((int)(tp.tx / cal.pixelWidth + rs / 2 + 2), 
+											(int)(tp.ty / cal.pixelHeight - rs / 2), 
 											String.valueOf(tracklist.indexOf(focusedlist)),
 											new Font("SansSerif", Font.PLAIN, 10));
 									numroi.setStrokeColor(rdt.getDataofColor(tracklist.indexOf(focusedlist)));
@@ -151,7 +151,7 @@ public class PTA2 extends PlugInFrame {
 								if(mw.isRoiTrack()) {
 									Roi squareroi;
 									int rs = tp.roisize;
-									squareroi = new Roi((int)tp.tx - rs / 2, (int)tp.ty - rs / 2, rs, rs);
+									squareroi = new Roi((int)(tp.tx - rs / 2.0), (int)(tp.ty - rs / 2.0), rs, rs);
 									squareroi.setStrokeColor(rdt.getDataofColor(tracklist.indexOf(focusedlist)));
 									tempol.add(squareroi);
 								}
